@@ -1,0 +1,261 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: vk photos 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-09-30 22:54+0400\n"
+"PO-Revision-Date: 2014-09-30 23:17+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: volod1n <ivan.volodin@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.4\n"
+"Language: RU\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#: class.main.php:74
+msgid "VK photos"
+msgstr "VK фотографии"
+
+#: class.main.php:75
+msgid "Albums online"
+msgstr "Альбомы на vk.com"
+
+#: class.main.php:76 class.main.php:437
+msgid "Albums on site"
+msgstr "Альбомы на сайте"
+
+#: class.main.php:77 class.main.php:119
+msgid "Templates"
+msgstr "Шаблоны"
+
+#: class.main.php:78 class.main.php:85
+msgid "Help"
+msgstr "Помощь"
+
+#: class.main.php:87
+msgid "More options shortcode"
+msgstr "Параметры шорткода"
+
+#: class.main.php:89
+msgid ""
+"template gallery, the default value is \"light\" or specified in plugin "
+"settings."
+msgstr "шаблон фотогалереи, по умолчанию  \"light\" или указанный в настройках"
+
+#: class.main.php:90
+msgid "number of photos per load, the default value is 12"
+msgstr "количество фотографий на странице, по умолчанию 12"
+
+#: class.main.php:91
+msgid "thumbnail size"
+msgstr "размер миниатюры"
+
+#: class.main.php:92
+msgid "size photos"
+msgstr "размер фотографии"
+
+#: class.main.php:93
+msgid "photos from the cache, or from vk.com"
+msgstr "фотографии из кэша или с сайта  vk.com"
+
+#: class.main.php:97
+msgid "For example:"
+msgstr "Например:"
+
+#: class.main.php:98
+msgid "Will be used by the parameters set by default."
+msgstr "Будут использованы параметры, установленные по умолчанию."
+
+#: class.main.php:99
+msgid "Gallery template-based"
+msgstr "Галерея на основе шаблонов"
+
+#: class.main.php:100
+msgid "Output to 24 photos."
+msgstr "Вывод 24 фотографий."
+
+#: class.main.php:103
+msgid "Image sizes"
+msgstr "Размер фотографии"
+
+#: class.main.php:104 class.main.php:105 class.main.php:106 class.main.php:107
+#: class.main.php:108 class.main.php:109
+msgid "url photos with maximum size"
+msgstr "ссылка на фотографию с максимальным размером"
+
+#: class.main.php:142
+msgid "Settings VK gallery"
+msgstr "Настройка VK галереи"
+
+#: class.main.php:143
+msgid "(default values)"
+msgstr "(значения по умолчанию)"
+
+#: class.main.php:147
+msgid "Count photos to view"
+msgstr "Количество фотографий для просмотра"
+
+#: class.main.php:153
+msgid "Preview size"
+msgstr "Размер миниатюры"
+
+#: class.main.php:165
+msgid "Photo view size"
+msgstr "Размер фотографии"
+
+#: class.main.php:177
+msgid "Template"
+msgstr "Шаблон"
+
+#: class.main.php:200
+msgid "Viewer"
+msgstr "Просмотрщик"
+
+#: class.main.php:209
+msgid "Show title"
+msgstr "Показать заголовок"
+
+#: class.main.php:215
+msgid "Show description"
+msgstr "Показать описание"
+
+#: class.main.php:221
+msgid "Show signatures"
+msgstr "Показать подписи"
+
+#: class.main.php:227
+msgid "Enable caching"
+msgstr "Включить кэширование"
+
+#: class.main.php:230
+msgid "Сache size:"
+msgstr "Размер кэша:"
+
+#: class.main.php:234
+msgid "Calculate the size of the cache "
+msgstr "Рассчитать размер кэша"
+
+#: class.main.php:236
+msgid "(slows down the admin albums)"
+msgstr "(может замедлять управление альбомами)"
+
+#: class.main.php:240
+msgid "Lifetime of the cache (h)"
+msgstr "Время жизни кэша (час.)"
+
+#: class.main.php:243
+msgid ""
+"If the value of \"Lifetime of the cache\" = 0, the files are cached "
+"indefinitely."
+msgstr ""
+"Если \"время жизни кэша\" = 0, файлы кэшируются на неопределенный срок."
+
+#: class.main.php:248
+msgid "Preview (only cached photos)"
+msgstr "Миниатюра (только для кэширования)"
+
+#: class.main.php:251
+msgid "keep the proportions"
+msgstr "сохранить пропорции"
+
+#: class.main.php:252
+msgid "square"
+msgstr "квадрат"
+
+#: class.main.php:265
+msgid "Folder for the cache, which is created:"
+msgstr "Папка для кэша:"
+
+#: class.main.php:267
+msgid "It is impossible to create a folder"
+msgstr "Невозможно создать папку"
+
+#: class.main.php:270 class.main.php:274
+msgid "Directory"
+msgstr "Папка"
+
+#: class.main.php:270 class.main.php:274
+msgid "protected to write."
+msgstr "защищена от записи."
+
+#: class.main.php:276
+msgid "Directory for cache: "
+msgstr "Папка для кэша:"
+
+#: class.main.php:284
+msgid "Accounts"
+msgstr "Учетные записи"
+
+#: class.main.php:314
+msgid "group"
+msgstr "группа"
+
+#: class.main.php:315
+msgid "user"
+msgstr "пользователь"
+
+#: class.main.php:326
+msgid "Save"
+msgstr "Сохранить"
+
+#: class.main.php:345
+msgid "Albums"
+msgstr "Альбомы"
+
+#: class.main.php:379
+msgid "Title"
+msgstr "Заголовок"
+
+#: class.main.php:379
+msgid "Created"
+msgstr "Создано"
+
+#: class.main.php:379
+msgid "Updated"
+msgstr "Обновлено"
+
+#: class.main.php:379
+msgid "Photos"
+msgstr "Фотографии"
+
+#: class.main.php:379
+msgid "In cache"
+msgstr "В кэше"
+
+#: class.main.php:379 class.main.php:441
+msgid "Shortcode"
+msgstr "Шорткод"
+
+#: class.main.php:400
+msgid "No Albums Found"
+msgstr "Альбомы не найдены"
+
+#: class.main.php:437
+msgid "(in cache)"
+msgstr "(в кэше)"
+
+#: class.main.php:441
+msgid "Name"
+msgstr "Имя"
+
+#: class.main.php:441
+msgid "Size"
+msgstr "Размер"
+
+#: class.main.php:441
+msgid "Action"
+msgstr "Действия"
+
+#: class.main.php:476 class.main.php:489
+msgid "delete"
+msgstr "удалить"
+
+#: class.main.php:786
+msgid "more"
+msgstr "далее"

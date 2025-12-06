@@ -1,0 +1,46 @@
+<style>
+
+.container[[ID]] {
+	width: 96%;
+	margin: 10px auto;
+	overflow: hidden;
+}
+ 
+.galleryItem[[ID]] img {
+	max-width: 100%;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+
+.galleryItem[[ID]] {
+	color: #797478;
+	font: 8pt/1.5 Verdana, Helvetica, sans-serif;
+	float: left;
+ 	width: 23%;
+	margin:  1% 1% 1% 1%;
+	display:block;
+}
+
+
+
+/* MEDIA QUERIES*/
+@media only screen and (max-width : 940px),
+only screen and (max-device-width : 940px){
+	.galleryItem[[ID]] {width: 30%;}
+}
+ 
+@media only screen and (max-width : 720px),
+only screen and (max-device-width : 720px){
+	.galleryItem[[ID]] {width: 46%;}
+}
+ 
+@media only screen and (max-width : 330px),
+only screen and (max-device-width : 330px){
+	.galleryItem[[ID]] {width: 96%;}
+	.galleryItem[[ID]] img {width: 96%;}
+	.galleryItem[[ID]] p {font-size: 10pt;}
+}
+ 
+
+</style>

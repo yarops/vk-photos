@@ -1,0 +1,57 @@
+<style>
+/* FRESH TEMPLATE */
+
+.group:before,
+.group:after {
+	content:" ";
+	display:table;
+	}
+.group:after {
+	clear:both;
+	}
+
+
+.mosaicflow {
+	margin-bottom:40px;
+	}
+
+
+.mosaicflow__column {
+	float:left;
+	}
+
+.mosaicflow__item {
+	position:relative;
+	}
+	.mosaicflow__item img {
+		display:block;
+		width:100%;
+		max-width:400px;
+		height:auto;
+		}
+	.mosaicflow__item p {
+		position:absolute;
+		bottom:0;
+		left:0;
+		width:96%;
+		margin:0;
+		padding:5px;
+		background:hsla(0,0%,0%,.5);
+		color:#fff;
+		font-size:14px;
+		text-shadow:1px 1px 1px hsla(0,0%,0%,.75);
+		opacity:0;
+		-webkit-transition: all 0.4s cubic-bezier(0.23,1,0.32,1);
+		   -moz-transition: all 0.4s cubic-bezier(0.23,1,0.32,1);
+		     -o-transition: all 0.4s cubic-bezier(0.23,1,0.32,1);
+		        transition: all 0.4s cubic-bezier(0.23,1,0.32,1);
+		}
+	.mosaicflow__item:hover p {
+		opacity:1;
+		}
+
+
+</style>
+
+<script src="[[DIRECTORY_PLUGIN]]templates/fresh/jquery.mosaicflow.min.js"></script> 
+ 

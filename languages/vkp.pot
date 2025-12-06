@@ -1,0 +1,259 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-09-30 22:54+0400\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: class.main.php:74
+msgid "VK photos"
+msgstr ""
+
+#: class.main.php:75
+msgid "Albums online"
+msgstr ""
+
+#: class.main.php:76 class.main.php:437
+msgid "Albums on site"
+msgstr ""
+
+#: class.main.php:77 class.main.php:119
+msgid "Templates"
+msgstr ""
+
+#: class.main.php:78 class.main.php:85
+msgid "Help"
+msgstr ""
+
+#: class.main.php:87
+msgid "More options shortcode"
+msgstr ""
+
+#: class.main.php:89
+msgid ""
+"template gallery, the default value is \"light\" or specified in plugin "
+"settings."
+msgstr ""
+
+#: class.main.php:90
+msgid "number of photos per load, the default value is 12"
+msgstr ""
+
+#: class.main.php:91
+msgid "thumbnail size"
+msgstr ""
+
+#: class.main.php:92
+msgid "size photos"
+msgstr ""
+
+#: class.main.php:93
+msgid "photos from the cache, or from vk.com"
+msgstr ""
+
+#: class.main.php:97
+msgid "For example:"
+msgstr ""
+
+#: class.main.php:98
+msgid "Will be used by the parameters set by default."
+msgstr ""
+
+#: class.main.php:99
+msgid "Gallery template-based"
+msgstr ""
+
+#: class.main.php:100
+msgid "Output to 24 photos."
+msgstr ""
+
+#: class.main.php:103
+msgid "Image sizes"
+msgstr ""
+
+#: class.main.php:104 class.main.php:105 class.main.php:106 class.main.php:107
+#: class.main.php:108 class.main.php:109
+msgid "url photos with maximum size"
+msgstr ""
+
+#: class.main.php:142
+msgid "Settings VK gallery"
+msgstr ""
+
+#: class.main.php:143
+msgid "(default values)"
+msgstr ""
+
+#: class.main.php:147
+msgid "Count photos to view"
+msgstr ""
+
+#: class.main.php:153
+msgid "Preview size"
+msgstr ""
+
+#: class.main.php:165
+msgid "Photo view size"
+msgstr ""
+
+#: class.main.php:177
+msgid "Template"
+msgstr ""
+
+#: class.main.php:200
+msgid "Viewer"
+msgstr ""
+
+#: class.main.php:209
+msgid "Show title"
+msgstr ""
+
+#: class.main.php:215
+msgid "Show description"
+msgstr ""
+
+#: class.main.php:221
+msgid "Show signatures"
+msgstr ""
+
+#: class.main.php:227
+msgid "Enable caching"
+msgstr ""
+
+#: class.main.php:230
+msgid "Сache size:"
+msgstr ""
+
+#: class.main.php:234
+msgid "Calculate the size of the cache "
+msgstr ""
+
+#: class.main.php:236
+msgid "(slows down the admin albums)"
+msgstr ""
+
+#: class.main.php:240
+msgid "Lifetime of the cache (h)"
+msgstr ""
+
+#: class.main.php:243
+msgid ""
+"If the value of \"Lifetime of the cache\" = 0, the files are cached "
+"indefinitely."
+msgstr ""
+
+#: class.main.php:248
+msgid "Preview (only cached photos)"
+msgstr ""
+
+#: class.main.php:251
+msgid "keep the proportions"
+msgstr ""
+
+#: class.main.php:252
+msgid "square"
+msgstr ""
+
+#: class.main.php:265
+msgid "Folder for the cache, which is created:"
+msgstr ""
+
+#: class.main.php:267
+msgid "It is impossible to create a folder"
+msgstr ""
+
+#: class.main.php:270 class.main.php:274
+msgid "Directory"
+msgstr ""
+
+#: class.main.php:270 class.main.php:274
+msgid "protected to write."
+msgstr ""
+
+#: class.main.php:276
+msgid "Directory for cache: "
+msgstr ""
+
+#: class.main.php:284
+msgid "Accounts"
+msgstr ""
+
+#: class.main.php:314
+msgid "group"
+msgstr ""
+
+#: class.main.php:315
+msgid "user"
+msgstr ""
+
+#: class.main.php:326
+msgid "Save"
+msgstr ""
+
+#: class.main.php:345
+msgid "Albums"
+msgstr ""
+
+#: class.main.php:379
+msgid "Title"
+msgstr ""
+
+#: class.main.php:379
+msgid "Created"
+msgstr ""
+
+#: class.main.php:379
+msgid "Updated"
+msgstr ""
+
+#: class.main.php:379
+msgid "Photos"
+msgstr ""
+
+#: class.main.php:379
+msgid "In cache"
+msgstr ""
+
+#: class.main.php:379 class.main.php:441
+msgid "Shortcode"
+msgstr ""
+
+#: class.main.php:400
+msgid "No Albums Found"
+msgstr ""
+
+#: class.main.php:437
+msgid "(in cache)"
+msgstr ""
+
+#: class.main.php:441
+msgid "Name"
+msgstr ""
+
+#: class.main.php:441
+msgid "Size"
+msgstr ""
+
+#: class.main.php:441
+msgid "Action"
+msgstr ""
+
+#: class.main.php:476 class.main.php:489
+msgid "delete"
+msgstr ""
+
+#: class.main.php:786
+msgid "more"
+msgstr ""
