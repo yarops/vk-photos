@@ -80,6 +80,57 @@ function trPictureSize($oldsize){
 }
 
 ////////////////////////////////////////////////////////////////////
+// нормализация структуры фотографий из нового формата VK API в старый формат
+function vkp_normalize_photos_response($photos){
+	if(!is_array($photos) || !isset($photos['response']) || !is_array($photos['response']) || !isset($photos['response']['items'])){
+		return array();
+	}
+
+	// Convert items to array if it's an object (new VK API format).
+	$items = $photos['response']['items'];
+	if(!is_array($items)){
+		$items = (array)$items;
+	}
+	// Remove numeric string keys and reindex if needed (convert object-like array to regular array).
+	$items = array_values($items);
+
+	// Normalize photo structure: convert new format (sizes array) to old format (direct photo_* fields).
+	foreach($items as $key => $photo){
+		if(isset($photo['sizes']) && is_array($photo['sizes'])){
+			// Map VK API size types to old format.
+			$sizeMap = array(
+				's' => 'photo_75',
+				'm' => 'photo_130',
+				'x' => 'photo_604',
+				'y' => 'photo_807',
+				'z' => 'photo_1280',
+				'w' => 'photo_2560',
+				'o' => 'photo_75',
+				'p' => 'photo_130',
+				'q' => 'photo_604',
+				'r' => 'photo_807',
+				'base' => 'photo_2560'
+			);
+			// Convert sizes array to direct fields.
+			foreach($photo['sizes'] as $sizeItem){
+				if(isset($sizeItem['type']) && isset($sizeItem['url'])){
+					$oldKey = isset($sizeMap[$sizeItem['type']]) ? $sizeMap[$sizeItem['type']] : null;
+					if($oldKey && !isset($items[$key][$oldKey])){
+						$items[$key][$oldKey] = $sizeItem['url'];
+					}
+				}
+			}
+			// Also try to get the largest size from orig_photo if available.
+			if(isset($photo['orig_photo']['url'])){
+				$items[$key]['photo_2560'] = $photo['orig_photo']['url'];
+			}
+		}
+	}
+
+	return $items;
+}
+
+////////////////////////////////////////////////////////////////////
 // триггер
 function vkp_add_trigger($vars) {
 		$vars[] = 'vkp';

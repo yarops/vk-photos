@@ -697,8 +697,13 @@ class VKPhotos
 
 				if(!is_array($photos)) return;
 
+				// Normalize photos response from new VK API format to old format.
+				$items = vkp_normalize_photos_response($photos);
+				if(empty($items)){
+					return;
+				}
 
-				foreach ($photos['response']['items'] as $key => $value) {
+				foreach ($items as $key => $value) {
 
 						// кешируем фотографии
 

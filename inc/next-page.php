@@ -54,9 +54,29 @@ $VKP = new vkapi();
             $photos = $VKP->api('photos.get', array('album_id'=>$id,'owner_id'=>$owner, 'access_token'=>$acces_token));
         }
 
+		// Check for API errors.
+		if(is_array($photos) && isset($photos['error']) && is_array($photos['error'])){
+			$error_msg = isset($photos['error']['error_msg']) ? $photos['error']['error_msg'] : __('Unknown error','vkp');
+			$error_code = isset($photos['error']['error_code']) ? $photos['error']['error_code'] : '';
+			echo "<div style='padding:10px; background:#fff3cd; border:1px solid #ffc107; color:#856404;'>";
+			echo "<strong>".__('VK API Error:','vkp')."</strong> ".$error_msg;
+			if($error_code){
+				echo " (".__('Code','vkp').": ".$error_code.")";
+			}
+			if(strpos($error_msg, 'private') !== false || strpos($error_msg, 'приватн') !== false){
+				echo "<br><small>".__('Tip: Make sure the profile/group privacy settings allow access to photos, or use an access token with proper permissions.','vkp')."</small>";
+			}
+			echo "</div>";
+			return;
+		}
 
 		if(!is_array($photos)) return;
 
+		// Normalize photos response from new VK API format to old format.
+		$items = vkp_normalize_photos_response($photos);
+		if(empty($items)){
+			return;
+		}
 
 // получим части шаблона
 
@@ -70,9 +90,9 @@ $VKP = new vkapi();
             $templateItem = str_replace("[[VIEWER]]", $templateViewer, $templateItem);
 			$templateItem = str_replace("[[ID]]", $id, $templateItem);
 
-			$allCount = count($photos['response']['items']);
+			$allCount = count($items);
 
-			$photos = array_slice($photos['response']['items'],(($page-1)*$count),$count);
+			$photos = array_slice($items,(($page-1)*$count),$count);
 
                 foreach ($photos as $key => $value) {
 

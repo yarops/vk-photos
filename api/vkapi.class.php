@@ -21,7 +21,11 @@ class vkapi {
 	public function api($method,$params=false) {
 		if (!$params) $params = array();
 
-			$params["v"] =  "5.199";
+			// Use API version 5.199 (new format with sizes array).
+			// The code will convert new format to old format for compatibility.
+			if(!isset($params["v"])){
+				$params["v"] =  "5.199";
+			}
 
 			ksort($params);
 			$sig = '';
