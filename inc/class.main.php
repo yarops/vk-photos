@@ -334,9 +334,9 @@ class VKPhotos
 							<?php
 									for ($i=1; $i <=10 ; $i++) {
 										// сделаем запрос в контакт и спроим id
-										if(isset($this->vkpAccaunts[$i]) && ((int)$this->vkpAccaunts[$i])>0){
+										if(isset($this->vkpAccaunts[$i]) && ((int)$this->vkpAccaunts[$i])!=0){
 											// делаем запрос для пользователя
-											if(isset($this->vkpAccaunts_type[$i]) && $this->vkpAccaunts_type[$i]=='user'){
+											if(isset($this->vkpAccaunts_type[$i]) && $this->vkpAccaunts_type[$i]=='user' && ((int)$this->vkpAccaunts[$i])>0){
 												$resp = $this->VKP->api('users.get', array('access_token'=> $this->vkpAccessToken,'user_id'=>$this->vkpAccaunts[$i]));
 												if(isset($resp['error']) && is_array($resp['error'])){
 													$vk_name = "<font color='red'>".$resp['error']['error_msg']."</font>";
@@ -349,11 +349,14 @@ class VKPhotos
 											}
 											// запрос для группы
 											 if(isset($this->vkpAccaunts_type[$i]) && $this->vkpAccaunts_type[$i]=='group'){
-												$resp = $this->VKP->api('groups.getById', array('access_token'=> $this->vkpAccessToken,'group_id'=>$this->vkpAccaunts[$i]));
+												$resp = $this->VKP->api('groups.getById', array('access_token'=> $this->vkpAccessToken,'group_id'=>abs($this->vkpAccaunts[$i])));
 												if(isset($resp['error']) && is_array($resp['error'])){
 													$vk_name = "<font color='red'>".$resp['error']['error_msg']."</font>";
-												}elseif(isset($resp['response']) && is_array($resp['response']) && !empty($resp['response'][0])){
-													$vk_name = "<a href='http://vk.com/".$resp['response'][0]['screen_name']."' target='_blank'><font color='green'>".$resp['response'][0]['name']."</font></a>";
+												}elseif(isset($resp['response']['groups']) && is_array($resp['response']['groups']) && !empty($resp['response']['groups'][0])){
+													$group = $resp['response']['groups'][0];
+													// Используем screen_name если доступен, иначе id.
+													$group_link = isset($group['screen_name']) && !empty($group['screen_name']) ? $group['screen_name'] : (isset($group['id']) ? 'club'.$group['id'] : 'club'.abs($this->vkpAccaunts[$i]));
+													$vk_name = "<a href='http://vk.com/".$group_link."' target='_blank'><font color='green'>".$group['name']."</font></a>";
 												}else{
 													$vk_name = "<font color='red'>".__('Error getting group info','vkp')."</font>";
 												}
@@ -415,12 +418,15 @@ class VKPhotos
 												}
 											}
 											// запрос для группы
-											 if(isset($this->vkpAccaunts_type[$i]) && $this->vkpAccaunts_type[$i]=='group'){
+											elseif(isset($this->vkpAccaunts_type[$i]) && $this->vkpAccaunts_type[$i]=='group'){
 												$resp = $this->VKP->api('groups.getById', array('access_token'=> $this->vkpAccessToken,'group_id'=>$this->vkpAccaunts[$i]));
 												if(isset($resp['error']) && is_array($resp['error'])){
 													$_error = $resp['error']['error_msg'];
-												}elseif(isset($resp['response']) && is_array($resp['response']) && !empty($resp['response'][0])){
-													$vk_name = "<a href='http://vk.com/".$resp['response'][0]['screen_name']."' target='_blank'><font color='green'>".$resp['response'][0]['name']."</font></a>";
+												}elseif(isset($resp['response']['groups']) && is_array($resp['response']['groups']) && !empty($resp['response']['groups'][0])){
+													$group = $resp['response']['groups'][0];
+													// Используем screen_name если доступен, иначе id.
+													$group_link = isset($group['screen_name']) && !empty($group['screen_name']) ? $group['screen_name'] : (isset($group['id']) ? 'club'.$group['id'] : 'club'.$this->vkpAccaunts[$i]);
+													$vk_name = "<a href='http://vk.com/".$group_link."' target='_blank'><font color='green'>".$group['name']."</font></a>";
 												}else{
 													$_error = __('Error getting group info','vkp');
 												}
@@ -429,8 +435,8 @@ class VKPhotos
 											if($_error==0){
 												echo "<h3>".$vk_name."</h3>";
 												// смотрим на альбомы пользователя
-												$owner_prefix = (isset($this->vkpAccaunts_type[$i]) && $this->vkpAccaunts_type[$i]=='group' ? "-":"");
-												$resp = $this->VKP->api('photos.getAlbums', array('access_token'=> $this->vkpAccessToken,'owner_id'=>$owner_prefix.$this->vkpAccaunts[$i]));
+												$owner_id = (isset($this->vkpAccaunts_type[$i]) && $this->vkpAccaunts_type[$i]=='group' ? "-".abs($this->vkpAccaunts[$i]) : $this->vkpAccaunts[$i]);
+												$resp = $this->VKP->api('photos.getAlbums', array('access_token'=> $this->vkpAccessToken,'owner_id'=>$owner_id));
 												// проверяем наличие ошибки в ответе
 												if(isset($resp['error']) && is_array($resp['error'])){
 													echo "<p><font color='red'>".__('Error getting albums:','vkp')." ".$resp['error']['error_msg']." (Error code: ".$resp['error']['error_code'].")</font></p>";
@@ -541,9 +547,12 @@ class VKPhotos
 									if(isset($resp['error']) && is_array($resp['error'])){
 										$vk_name1 = "";
 										$vk_name2 = "<font color='red'>".$resp['error']['error_msg']."</font>";
-									}elseif(isset($resp['response']) && is_array($resp['response']) && !empty($resp['response'][0])){
-										$vk_name1 = "<img src='".$resp['response'][0]['photo']."' style='float:left;border:0px;margin:3px;width:24px;'>";
-										$vk_name2 = "<big><a href='http://vk.com/club".$resp['response'][0]['gid']."' target='_blank'><font color='green'>".$resp['response'][0]['name']."</font></a></big>";
+									}elseif(isset($resp['response']['groups']) && is_array($resp['response']['groups']) && !empty($resp['response']['groups'][0])){
+										$group = $resp['response']['groups'][0];
+										$photo = isset($group['photo_50']) ? $group['photo_50'] : (isset($group['photo_100']) ? $group['photo_100'] : (isset($group['photo_200']) ? $group['photo_200'] : ''));
+										$vk_name1 = !empty($photo) ? "<img src='".$photo."' style='float:left;border:0px;margin:3px;width:24px;'>" : "";
+										$group_id = isset($group['id']) ? $group['id'] : abs($filename);
+										$vk_name2 = "<big><a href='http://vk.com/club".$group_id."' target='_blank'><font color='green'>".$group['name']."</font></a></big>";
 									}else{
 										$vk_name1 = "";
 										$vk_name2 = "<font color='red'>".__('Error getting group info','vkp')."</font>";
