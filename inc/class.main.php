@@ -1,5 +1,5 @@
 <?php
-class VKPhotos
+class VkPhotos
 {
 	// Properties declaration to avoid PHP 8.2+ dynamic property deprecation warnings.
 	public $VKP;

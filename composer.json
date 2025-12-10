@@ -1,0 +1,49 @@
+{
+	"name": "yarops/vk-photos",
+	"description": "Photo gallery from vk.com - WordPress plugin",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
+	"authors": [
+		{
+			"name": "Yaroslv Popov",
+			"email": "yarops.one@gmail.com",
+			"homepage": "https://codesweet.ru"
+		}
+	],
+	"require": {
+		"php": ">=8.0",
+		"illuminate/container": "^11.0"
+	},
+	"require-dev": {
+		"squizlabs/php_codesniffer": "^3.7",
+		"wp-coding-standards/wpcs": "^3.0",
+		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+		"vimeo/psalm": "^5.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"VkPhotos\\": "src/"
+		},
+		"classmap": [
+			"inc/",
+			"api/"
+		]
+	},
+	"config": {
+		"optimize-autoloader": true,
+		"sort-packages": true,
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	},
+	"scripts": {
+		"phpcs": "phpcs",
+		"phpcbf": "phpcbf",
+		"psalm": "psalm",
+		"psalm:clear-cache": "psalm --clear-cache",
+		"lint": [
+			"@phpcs",
+			"@psalm"
+		]
+	}
+}

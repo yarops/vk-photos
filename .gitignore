@@ -1,22 +1,3 @@
-# WordPress
-wp-config.php
-wp-content/uploads/
-wp-content/upgrade/
-wp-content/backup-db/
-wp-content/advanced-cache.php
-wp-content/wp-cache-config.php
-wp-content/cache/
-wp-content/blogs.dir/
-wp-content/upgrade/
-wp-content/backup-db/
-wp-content/uploads/
-wp-content/wp-cache-config.php
-wp-content/cache/
-wp-content/blogs.dir/
-wp-content/upgrade/
-wp-content/backup-db/
-wp-content/uploads/
-
 # Node.js
 node_modules/
 npm-debug.log*
@@ -39,6 +20,7 @@ env.json
 
 # IDE and Editor files
 .vscode/
+.cursor/
 .idea/
 *.swp
 *.swo
@@ -90,6 +72,11 @@ composer.lock
 *.log
 *.cache
 
+# PHPCS & Psalm
+.psalm-cache/
+psalm-report.xml
+.phpcs-cache/
+
 # Temporary files
 *.tmp
 *.temp
@@ -115,3 +102,6 @@ webpack-stats.json
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+
+# Docs
+docs/
