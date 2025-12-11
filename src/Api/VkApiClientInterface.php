@@ -24,14 +24,6 @@ interface VkApiClientInterface {
 	public function api( string $method, array $params = array() ): array;
 
 	/**
-	 * Get albums for owner.
-	 *
-	 * @param int $owner_id Owner ID (user or group).
-	 * @return array Albums data.
-	 */
-	public function get_albums( int $owner_id ): array;
-
-	/**
 	 * Get photos from album.
 	 *
 	 * @param int $owner_id Owner ID (user or group).
