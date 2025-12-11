@@ -146,43 +146,13 @@ function vkp_next_page() {
 }
 
 /**
- * Register plugin settings.
- */
-function VKPPhotosRegisterSettings() {
-	// Check if cache deletion is requested.
-	if ( is_admin() && isset( $_GET['clearcache'] ) ) {
-		$clearcache = explode( '|', $_GET['clearcache'] );
-		$clearcache_owner = isset( $clearcache[0] ) ? (int) $clearcache[0] : 0;
-		$clearcache_id    = isset( $clearcache[1] ) ? (int) $clearcache[1] : 0;
-		vkp_delete_cache( $clearcache_owner, $clearcache_id );
-	}
-
-	register_setting( 'VKPPhotosSettingsGroup', 'vkpCountPhotos' );
-	register_setting( 'VKPPhotosSettingsGroup', 'vkpAccaunts' );
-	register_setting( 'VKPPhotosSettingsGroup', 'vkpAccaunts_type' );
-	register_setting( 'VKPPhotosSettingsGroup', 'vkpEnableCaching' );
-	register_setting( 'VKPPhotosSettingsGroup', 'vkpAccessToken' );
-	register_setting( 'VKPPhotosSettingsGroup', 'vkpLifeTimeCaching' );
-	register_setting( 'VKPPhotosSettingsGroup', 'vkpPreviewSize' );
-	register_setting( 'VKPPhotosSettingsGroup', 'vkpPhotoViewSize' );
-	register_setting( 'VKPPhotosSettingsGroup', 'vkpPreviewType' );
-	register_setting( 'VKPPhotosSettingsGroup', 'vkpShowTitle' );
-	register_setting( 'VKPPhotosSettingsGroup', 'vkpShowSignatures' );
-	register_setting( 'VKPPhotosSettingsGroup', 'vkpTemplate' );
-	register_setting( 'VKPPhotosSettingsGroup', 'vkpViewer' );
-	register_setting( 'VKPPhotosSettingsGroup', 'vkpCalculateCache' );
-	register_setting( 'VKPPhotosSettingsGroup', 'vkpShowDescription' );
-	register_setting( 'VKPPhotosSettingsGroup', 'vkpMoreTitle' );
-}
-
-/**
  * Delete cache for specific album.
  *
  * @param int $owner Album owner ID.
  * @param int $id    Album ID.
  */
 function vkp_delete_cache( $owner, $id ) {
-	$upload_dir   = wp_upload_dir();
+	$upload_dir    = wp_upload_dir();
 	$dir_for_cache = $upload_dir['basedir'] . '/vk-photos-cache/';
 
 	if ( file_exists( $dir_for_cache . $owner . '/' . $id ) ) {

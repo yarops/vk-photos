@@ -12,6 +12,30 @@ namespace VkPhotos\Models;
 class Settings {
 
 	/**
+	 * Keys for settings.
+	 *
+	 * @var array<string>
+	 */
+	public array $keys = array(
+		'vkpCountPhotos',
+		'vkpAccaunts',
+		'vkpAccaunts_type',
+		'vkpEnableCaching',
+		'vkpAccessToken',
+		'vkpLifeTimeCaching',
+		'vkpPreviewSize',
+		'vkpPhotoViewSize',
+		'vkpPreviewType',
+		'vkpShowTitle',
+		'vkpShowSignatures',
+		'vkpTemplate',
+		'vkpViewer',
+		'vkpCalculateCache',
+		'vkpShowDescription',
+		'vkpMoreTitle',
+	);
+
+	/**
 	 * Number of photos to display.
 	 *
 	 * @var int

@@ -12,6 +12,8 @@ use VkPhotos\Container;
 use VkPhotos\Config;
 use VkPhotos\Api\VkApiClientInterface;
 use VkPhotos\Api\VkApiClientImpl;
+use VkPhotos\Services\SettingsService;
+use VkPhotos\Models\Settings as SettingsModel;
 
 /**
  * Class Bootstrap.
@@ -101,6 +103,22 @@ class Bootstrap {
 				return new VkApiClientImpl();
 			}
 		);
+
+		// Bind settings model.
+		Container::singleton(
+			SettingsModel::class,
+			function (): SettingsModel {
+				return new SettingsModel();
+			}
+		);
+
+		// Bind settings service.
+		Container::singleton(
+			SettingsService::class,
+			function (): SettingsService {
+				return new SettingsService( Container::make( SettingsModel::class ) );
+			}
+		);
 	}
 
 	/**
@@ -110,7 +128,13 @@ class Bootstrap {
 	 */
 	private function register_hooks(): void {
 		// Register settings.
-		add_action( 'admin_init', 'VKPPhotosRegisterSettings' );
+		add_action(
+			'admin_init',
+			function (): void {
+				$settings_service = Container::make( SettingsService::class );
+				$settings_service->register_settings();
+			}
+		);
 
 		// Register query vars and template redirect.
 		add_filter( 'query_vars', 'vkp_add_trigger' );
