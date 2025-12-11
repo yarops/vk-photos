@@ -99,20 +99,16 @@ class Config {
 	 * @return void
 	 */
 	public static function set( string $key, $value ): void {
-		$keys   = explode( '.', $key );
-		$config = &self::$config;
+		$keys = explode( '.', $key );
 
-		foreach ( $keys as $segment ) {
-			if ( ! is_array( $config ) ) {
-				$config = array();
-			}
-			if ( ! array_key_exists( $segment, $config ) ) {
-				$config[ $segment ] = array();
-			}
-			$config = &$config[ $segment ];
+		// Build nested array structure from the end.
+		$nested = $value;
+		for ( $i = count( $keys ) - 1; $i >= 0; $i-- ) {
+			$nested = array( $keys[ $i ] => $nested );
 		}
 
-		$config = $value;
+		// Merge with existing config.
+		self::$config = array_replace_recursive( self::$config, $nested );
 	}
 
 	/**
