@@ -68,4 +68,15 @@ class SettingsService {
 			register_setting( 'VKPPhotosSettingsGroup', $key );
 		}
 	}
+
+	/**
+	 * Get settings model.
+	 *
+	 * @return SettingsModel Settings model instance.
+	 */
+	public function get_settings(): SettingsModel {
+		// Reload settings from WordPress options to get latest values.
+		$this->load_from_wp_options();
+		return $this->settings;
+	}
 }

@@ -14,6 +14,7 @@ use VkPhotos\Api\VkApiClientInterface;
 use VkPhotos\Api\VkApiClientImpl;
 use VkPhotos\Services\SettingsService;
 use VkPhotos\Models\Settings as SettingsModel;
+use VkPhotos\Hooks\AdminHooks;
 
 /**
  * Class Bootstrap.
@@ -72,6 +73,11 @@ class Bootstrap {
 
 		// Register hooks.
 		$this->register_hooks();
+
+		// Initialize admin hooks.
+		if ( is_admin() ) {
+			new AdminHooks();
+		}
 
 		// Initialize main plugin class.
 		if ( class_exists( 'VkPhotos' ) ) {
