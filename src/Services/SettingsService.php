@@ -28,6 +28,23 @@ class SettingsService {
 	 */
 	public function __construct( SettingsModel $settings ) {
 		$this->settings = $settings;
+		$this->load_from_wp_options();
+	}
+
+	/**
+	 * Load settings from WordPress options.
+	 *
+	 * @return void
+	 */
+	private function load_from_wp_options(): void {
+		$wp_options = array();
+		foreach ( SettingsModel::CONFIG as $config ) {
+			list( $legacy_key )        = $config;
+			$wp_options[ $legacy_key ] = get_option( $legacy_key );
+		}
+
+		// Reinitialize model with WordPress options.
+		$this->settings = new SettingsModel( $wp_options );
 	}
 
 	/**
@@ -47,7 +64,7 @@ class SettingsService {
 		}
 
 		// Register all settings from model.
-		foreach ( $this->settings->keys as $key ) {
+		foreach ( $this->settings->get_keys() as $key ) {
 			register_setting( 'VKPPhotosSettingsGroup', $key );
 		}
 	}
