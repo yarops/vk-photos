@@ -113,26 +113,6 @@ class VkPhotos {
 	public function vkphotos_add_menu() {
 		add_submenu_page( 'vk-photos.php', __( 'Albums online', 'vkp' ), __( 'Albums online', 'vkp' ), 'manage_options', 'vk-shortcode', array( $this, 'vk_albums' ) );
 		add_submenu_page( 'vk-photos.php', __( 'Albums on site', 'vkp' ), __( 'Albums on site', 'vkp' ), 'manage_options', 'vk-cache', array( $this, 'vk_albums_on_cache' ) );
-		add_submenu_page( 'vk-photos.php', __( 'Templates', 'vkp' ), __( 'Templates', 'vkp' ), 'manage_options', 'vk-templates', array( $this, 'vk_templates' ) );
-	}
-
-	// ШАБЛОНЫ
-	public function vk_templates() {
-
-		echo "<div class='wrap'><h2>" . __( 'Templates', 'vkp' ) . '</h2>';
-		// ищем список шаблонов
-		$dir = VKP__PLUGIN_DIR . 'templates';
-		if ( $dirstream = @opendir( $dir ) ) {
-			while ( false !== ( $filename = readdir( $dirstream ) ) ) {
-				if ( $filename != '.' && $filename != '..' ) {
-					if ( is_dir( $dir . '/' . $filename ) and file_exists( $dir . '/' . $filename . '/item.html' ) ) {
-						echo "<div style='float:left;margin:10px;'><h3>" . $filename . "<h3><img src='" . VKP__PLUGIN_URL . 'templates' . '/' . $filename . '/thumb.jpg' . "'></div>";
-					}
-				}
-			}
-			closedir( $dirstream );
-		}
-		echo '</div>';
 	}
 
 	//

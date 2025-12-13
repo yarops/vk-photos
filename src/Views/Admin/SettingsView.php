@@ -8,7 +8,6 @@ namespace VkPhotos\Views\Admin;
 use VkPhotos\Services\SettingsService;
 use VkPhotos\Models\Settings as SettingsModel;
 use VkPhotos\Api\VkApiClientInterface;
-use VkPhotos\Container;
 use VkPhotos\Config;
 
 /**

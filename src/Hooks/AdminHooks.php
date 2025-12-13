@@ -49,6 +49,15 @@ class AdminHooks {
 			'vk-help',
 			array( $this, 'vk_help' )
 		);
+
+		add_submenu_page(
+			'vk-photos.php',
+			__( 'Templates', 'vkp' ),
+			__( 'Templates', 'vkp' ),
+			'manage_options',
+			'vk-templates',
+			array( $this, 'vk_templates' )
+		);
 	}
 
 	/**
@@ -75,5 +84,16 @@ class AdminHooks {
 		// Use HelpView to render help page.
 		$help_view = new \VkPhotos\Views\Admin\HelpView();
 		$help_view->render();
+	}
+
+	/**
+	 * Render templates page.
+	 *
+	 * @return void
+	 */
+	public function vk_templates() {
+		// Use TemplatesView to render templates page.
+		$templates_view = new \VkPhotos\Views\Admin\TemplatesView();
+		$templates_view->render();
 	}
 }
