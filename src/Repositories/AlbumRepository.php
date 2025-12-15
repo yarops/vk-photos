@@ -38,7 +38,19 @@ class AlbumRepository {
 	 * @return array<Album> Array of Album models.
 	 */
 	public function get_albums( int $owner_id ): array {
+		$result = $this->get_albums_with_error( $owner_id );
+		return $result['albums'];
+	}
+
+	/**
+	 * Get albums with optional error context.
+	 *
+	 * @param int $owner_id Owner ID (user or group).
+	 * @return array{albums: array<Album>, error: string|null} Albums and error message if any.
+	 */
+	public function get_albums_with_error( int $owner_id ): array {
 		$albums = array();
+		$error  = null;
 
 		try {
 			// Use direct API call for consistency with get_album().
@@ -49,9 +61,21 @@ class AlbumRepository {
 				)
 			);
 
+			// Capture VK API errors.
+			if ( isset( $response['error'] ) && is_array( $response['error'] ) ) {
+				$error = $response['error']['error_msg'] ?? __( 'Unable to get albums.', 'vkp' );
+				return array(
+					'albums' => $albums,
+					'error'  => $error,
+				);
+			}
+
 			$items = $this->extract_items_from_response( $response );
 			if ( empty( $items ) ) {
-				return $albums;
+				return array(
+					'albums' => $albums,
+					'error'  => $error,
+				);
 			}
 
 			// Convert each item to Album model.
@@ -63,10 +87,17 @@ class AlbumRepository {
 			}
 		} catch ( \Exception $e ) {
 			// Log error if needed.
-			return $albums;
+			$error = $e->getMessage();
+			return array(
+				'albums' => $albums,
+				'error'  => $error,
+			);
 		}
 
-		return $albums;
+		return array(
+			'albums' => $albums,
+			'error'  => $error,
+		);
 	}
 
 	/**

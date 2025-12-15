@@ -13,7 +13,10 @@ use VkPhotos\Config;
 use VkPhotos\Api\VkApiClientInterface;
 use VkPhotos\Api\VkApiClientImpl;
 use VkPhotos\Services\SettingsService;
+use VkPhotos\Services\AlbumsService;
 use VkPhotos\Models\Settings as SettingsModel;
+use VkPhotos\Repositories\AlbumRepository;
+use VkPhotos\Interfaces\AlbumsViewData;
 use VkPhotos\Hooks\AdminHooks;
 
 /**
@@ -123,6 +126,34 @@ class Bootstrap {
 			SettingsService::class,
 			function (): SettingsService {
 				return new SettingsService( Container::make( SettingsModel::class ) );
+			}
+		);
+
+		// Bind album repository.
+		Container::singleton(
+			AlbumRepository::class,
+			function (): AlbumRepository {
+				return new AlbumRepository( Container::make( VkApiClientInterface::class ) );
+			}
+		);
+
+		// Bind albums service.
+		Container::singleton(
+			AlbumsService::class,
+			function (): AlbumsService {
+				return new AlbumsService(
+					Container::make( SettingsService::class ),
+					Container::make( VkApiClientInterface::class ),
+					Container::make( AlbumRepository::class )
+				);
+			}
+		);
+
+		// Bind AlbumsViewData interface to AlbumsService implementation.
+		Container::singleton(
+			AlbumsViewData::class,
+			function (): AlbumsViewData {
+				return Container::make( AlbumsService::class );
 			}
 		);
 	}

@@ -1,0 +1,27 @@
+В шаблоне albums-view.php используются следующие переменные через $this:
+$this->vkpAccaunts — массив аккаунтов VK (используется в строках 12, 19, 25, 37, 55, 59, 73, 78, 84)
+$this->vkpAccaunts_type — типы аккаунтов ('user' или 'group') (используется в строках 14, 25, 32, 55, 73)
+$this->vkpAccessToken — токен доступа VK API (используется в строках 18, 36, 59)
+$this->VKP — объект API для вызова методов VK (используется в строках 15, 33, 56)
+$this->vkpCalculateCache — настройка расчета кэша ('yes' или 'no') (используется в строке 84)
+$this->dirForCache — путь к директории кэша (используется в строке 84)
+$this->dir_size() — метод для расчета размера директории (используется в строке 84)
+В новом коде (по аналогии с SettingsView) эти переменные должны быть доступны через:
+$this->accounts вместо $this->vkpAccaunts
+$this->accounts_type вместо $this->vkpAccaunts_type
+$this->access_token вместо $this->vkpAccessToken
+$this->calculate_cache вместо $this->vkpCalculateCache
+$this->dir_for_cache вместо $this->dirForCache
+$this->VKP — через метод get_vkp()
+$this->dir_size() — метод класса
+
+Также в альбом должен приходить результат запроса к апи.
+Это должен быть массив моделей Album
+$owner_id = ( isset( $this->vkpAccaunts_type[ $i ] ) && $this->vkpAccaunts_type[ $i ] == 'group' ? '-' . abs( $this->vkpAccaunts[ $i ] ) : $this->vkpAccaunts[ $i ] );
+$resp     = $this->VKP->api(
+    'photos.getAlbums',
+    array(
+        'access_token' => $this->vkpAccessToken,
+        'owner_id'     => $owner_id,
+    )
+);

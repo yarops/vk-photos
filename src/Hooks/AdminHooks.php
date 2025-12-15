@@ -58,6 +58,15 @@ class AdminHooks {
 			'vk-templates',
 			array( $this, 'vk_templates' )
 		);
+
+		add_submenu_page(
+			'vk-photos.php',
+			__( 'Albums', 'vkp' ),
+			__( 'Albums', 'vkp' ),
+			'manage_options',
+			'vk-albums',
+			array( $this, 'vk_albums' )
+		);
 	}
 
 	/**
@@ -95,5 +104,16 @@ class AdminHooks {
 		// Use TemplatesView to render templates page.
 		$templates_view = new \VkPhotos\Views\Admin\TemplatesView();
 		$templates_view->render();
+	}
+
+	/**
+	 * Render albums page.
+	 *
+	 * @return void
+	 */
+	public function vk_albums() {
+		// Use AlbumsView to render albums page.
+		$albums_view = new \VkPhotos\Views\Admin\AlbumsView();
+		$albums_view->render();
 	}
 }
