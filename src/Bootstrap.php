@@ -194,9 +194,6 @@ class Bootstrap {
 			}
 		);
 
-		// Register scripts and styles.
-		add_action( 'wp_enqueue_scripts', 'vkp_scripts_register' );
-
 		// Register album shortcode.
 		add_action(
 			'init',

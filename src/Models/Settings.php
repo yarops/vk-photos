@@ -36,7 +36,7 @@ class Settings {
 		'show_title'       => array( 'vkpShowTitle', 'no', 'yesno', null ),
 		'show_signatures'  => array( 'vkpShowSignatures', 'no', 'yesno', null ),
 		'template'         => array( 'vkpTemplate', 'light', 'string', null ),
-		'viewer'           => array( 'vkpViewer', 'none', 'string', null ),
+		'viewer'           => array( 'vkpViewer', 'fancybox', 'string', null ),
 		'calculate_cache'  => array( 'vkpCalculateCache', 'no', 'yesno', null ),
 		'show_description' => array( 'vkpShowDescription', 'no', 'yesno', null ),
 		'more_title'       => array( 'vkpMoreTitle', '[далее]', 'string', null ),

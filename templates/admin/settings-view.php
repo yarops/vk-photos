@@ -74,9 +74,8 @@
 				<th align='left' valing='top'><?php _e( 'Viewer', 'vkp' ); ?></th>
 				<td>
 					<select name='vkpViewer'>
-							<option value='none' <?php selected( $this->viewer, 'none' ); ?>></option>
-							<option value='colorbox' <?php selected( $this->viewer, 'colorbox' ); ?>>colorbox</option>
-							<option value='swipebox' <?php selected( $this->viewer, 'swipebox' ); ?>>swipebox</option>
+						<option value='fancybox' <?php selected( $this->viewer, 'fancybox' ); ?>>fancybox</option>
+						<option value='new tab' <?php selected( $this->viewer, 'new tab' ); ?>>new tab</option>
 					</select>
 				</td>
 			</tr>

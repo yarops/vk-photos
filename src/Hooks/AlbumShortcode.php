@@ -91,7 +91,7 @@ class AlbumShortcode {
 			'id'               => 'no',
 			'owner'            => 'no',
 			'template'         => $settings->template ?? 'light',
-			'viewer'           => $settings->viewer ?? 'none',
+			'viewer'           => $settings->viewer ?? 'fancybox',
 			'sign'             => $settings->show_signatures ?? 'no',
 			'count'            => $settings->count_photos ?? 12,
 			'preview'          => $settings->preview_size ?? 'photo_130',
@@ -124,19 +124,28 @@ class AlbumShortcode {
 		$preview = $this->normalize_size( $atts['preview'], $atts['preview'] );
 		$photo   = $this->normalize_size( $atts['photo'], $atts['photo'] );
 
-		$template_viewer = '';
 		$output          = '';
+		$template_viewer = '';
 
-		// Configure viewer scripts/styles.
-		if ( $atts['viewer'] === 'colorbox' ) {
-			wp_enqueue_script( 'vkp_colorbox' );
-			wp_enqueue_style( 'vkp_colorbox' );
-			$template_viewer = ' class="vkpcolorbox"';
-		}
-		if ( $atts['viewer'] === 'swipebox' ) {
-			wp_enqueue_script( 'vkp_swipebox' );
-			wp_enqueue_style( 'vkp_swipebox' );
-			$template_viewer = ' class="swipebox"';
+		// Configure viewer based on settings.
+		if ( 'fancybox' === $atts['viewer'] ) {
+			// Enqueue Fancybox scripts and styles.
+			wp_enqueue_script(
+				'fancybox',
+				'https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js',
+				array( 'jquery' ),
+				'5.0',
+				true
+			);
+			wp_enqueue_style(
+				'fancybox',
+				'https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css',
+				array(),
+				'5.0'
+			);
+			$template_viewer = ' data-fancybox="gallery-' . esc_attr( $album_id ) . '"';
+		} elseif ( 'new tab' === $atts['viewer'] ) {
+			$template_viewer = ' target="_blank"';
 		}
 
 		$album = $this->album_repository->get_album( $owner, $album_id );
@@ -188,8 +197,10 @@ class AlbumShortcode {
 
 			if ( $atts['sign'] === 'yes' ) {
 				$item = str_replace( '[[SIGNATURES]]', esc_html( $photo_model->text ), $item );
-				if ( $atts['viewer'] === 'colorbox' || $atts['viewer'] === 'swipebox' ) {
-					$item = str_replace( '[[VIEWERSIGN]]', " title='" . esc_attr( $photo_model->text ) . "'", $item );
+				if ( 'fancybox' === $atts['viewer'] ) {
+					$item = str_replace( '[[VIEWERSIGN]]', " data-caption='" . esc_attr( $photo_model->text ) . "'", $item );
+				} else {
+					$item = str_replace( '[[VIEWERSIGN]]', '', $item );
 				}
 			}
 
@@ -199,6 +210,23 @@ class AlbumShortcode {
 
 		$output  = str_replace( '[[VIEWER]]', '', str_replace( '[[SIGNATURES]]', '', str_replace( '[[VIEWERSIGN]]', '', $output ) ) );
 		$output .= str_replace( '[[ID]]', $album_id, (string) $template_foot );
+
+		// Initialize Fancybox if viewer is fancybox.
+		if ( 'fancybox' === $atts['viewer'] ) {
+			$output .= '<script>
+				jQuery(document).ready(function($) {
+					Fancybox.bind("[data-fancybox=\'gallery-' . esc_js( $album_id ) . '\']", {
+						Toolbar: {
+							display: {
+								left: ["infobar"],
+								middle: [],
+								right: ["slideshow", "download", "thumbs", "close"]
+							}
+						}
+					});
+				});
+			</script>';
+		}
 
 		return $output;
 	}
