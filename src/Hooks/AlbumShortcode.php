@@ -9,8 +9,8 @@ use VkPhotos\Api\VkApiClientInterface;
 use VkPhotos\Container;
 use VkPhotos\Models\Photo as PhotoModel;
 use VkPhotos\Repositories\AlbumRepository;
-use VkPhotos\Repositories\PhotoRepository;
 use VkPhotos\Services\SettingsService;
+use VkPhotos\Services\PhotoService;
 
 /**
  * Registers and handles the album shortcode.
@@ -39,11 +39,11 @@ class AlbumShortcode {
 	private AlbumRepository $album_repository;
 
 	/**
-	 * Photo repository.
+	 * Photo service.
 	 *
-	 * @var PhotoRepository
+	 * @var PhotoService
 	 */
-	private PhotoRepository $photo_repository;
+	private PhotoService $photo_service;
 
 	/**
 	 * Allowed size keys (legacy names).
@@ -66,12 +66,12 @@ class AlbumShortcode {
 		?SettingsService $settings_service = null,
 		?VkApiClientInterface $api_client = null,
 		?AlbumRepository $album_repository = null,
-		?PhotoRepository $photo_repository = null
+		?PhotoService $photo_service = null
 	) {
 		$this->settings_service = $settings_service ?? Container::make( SettingsService::class );
 		$this->api_client       = $api_client ?? Container::make( VkApiClientInterface::class );
 		$this->album_repository = $album_repository ?? Container::make( AlbumRepository::class );
-		$this->photo_repository = $photo_repository ?? Container::make( PhotoRepository::class );
+		$this->photo_service    = $photo_service ?? Container::make( PhotoService::class );
 
 		add_shortcode( 'vkalbum', array( $this, 'render' ) );
 	}
@@ -144,7 +144,7 @@ class AlbumShortcode {
 			return '<div class="vkp-error">' . esc_html__( 'Album not found.', 'vkp' ) . '</div>';
 		}
 
-		$photos = $this->photo_repository->get_photos( $album_id, $owner );
+		$photos = $this->photo_service->get_photos( $album_id, $owner );
 		if ( empty( $photos ) ) {
 			return '<div class="vkp-error">' . esc_html__( 'Photos not available.', 'vkp' ) . '</div>';
 		}

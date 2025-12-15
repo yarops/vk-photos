@@ -10,6 +10,7 @@ use VkPhotos\Interfaces\AlbumsViewData;
 use VkPhotos\Models\Album;
 use VkPhotos\Models\Settings as SettingsModel;
 use VkPhotos\Repositories\AlbumRepository;
+use VkPhotos\Services\CacheServiceInterface;
 
 /**
  * Class AlbumsService.
@@ -46,6 +47,13 @@ class AlbumsService implements AlbumsViewData {
 	private string $cache_dir;
 
 	/**
+	 * Cache service.
+	 *
+	 * @var CacheServiceInterface
+	 */
+	private CacheServiceInterface $cache_service;
+
+	/**
 	 * Whether to calculate cache size.
 	 *
 	 * @var bool
@@ -55,19 +63,22 @@ class AlbumsService implements AlbumsViewData {
 	/**
 	 * Constructor.
 	 *
-	 * @param SettingsService      $settings_service Settings service.
-	 * @param VkApiClientInterface $api_client VK API client.
-	 * @param AlbumRepository      $album_repository Album repository.
+	 * @param SettingsService       $settings_service Settings service.
+	 * @param VkApiClientInterface  $api_client VK API client.
+	 * @param AlbumRepository       $album_repository Album repository.
+	 * @param CacheServiceInterface $cache_service   Cache service.
 	 * @return void
 	 */
 	public function __construct(
 		SettingsService $settings_service,
 		VkApiClientInterface $api_client,
-		AlbumRepository $album_repository
+		AlbumRepository $album_repository,
+		CacheServiceInterface $cache_service
 	) {
 		$this->settings_service = $settings_service;
 		$this->api_client       = $api_client;
 		$this->album_repository = $album_repository;
+		$this->cache_service    = $cache_service;
 		$this->cache_dir        = $this->resolve_cache_dir();
 	}
 
@@ -86,6 +97,8 @@ class AlbumsService implements AlbumsViewData {
 		return array(
 			'pageTitle' => __( 'Albums', 'vkp' ),
 			'accounts'  => $this->build_accounts_data( $settings ),
+			'actions'   => $this->build_cache_actions(),
+			'showCache' => $this->should_calculate_cache,
 		);
 	}
 
@@ -157,7 +170,7 @@ class AlbumsService implements AlbumsViewData {
 
 		$albums_view = array();
 		foreach ( $result['albums'] as $album ) {
-			$albums_view[] = $this->map_album_to_view( $album, $account_id, $is_group );
+			$albums_view[] = $this->map_album_to_view( $album, $account_id, $is_group, $owner_id );
 		}
 
 		return array(
@@ -172,9 +185,10 @@ class AlbumsService implements AlbumsViewData {
 	 * @param Album $album      Album model.
 	 * @param int   $account_id Account id without sign.
 	 * @param bool  $is_group   Whether account is group.
+	 * @param int   $owner_id   Owner id with sign (group negative).
 	 * @return array<string, mixed> Album view data.
 	 */
-	private function map_album_to_view( Album $album, int $account_id, bool $is_group ): array {
+	private function map_album_to_view( Album $album, int $account_id, bool $is_group, int $owner_id ): array {
 		$owner_prefix = $is_group ? '-' : '';
 
 		return array(
@@ -186,7 +200,7 @@ class AlbumsService implements AlbumsViewData {
 			'createdAt'   => $album->get_created_date(),
 			'updatedAt'   => $album->get_updated_date(),
 			'size'        => $album->size,
-			'cacheSizeMb' => $this->get_album_cache_size_mb( $account_id, $is_group, $album->id ),
+			'cacheSizeMb' => $this->get_album_cache_size_mb( $owner_id, $album->id ),
 			'shortcode'   => $album->get_shortcode(),
 		);
 	}
@@ -267,6 +281,25 @@ class AlbumsService implements AlbumsViewData {
 	}
 
 	/**
+	 * Build cache-related actions for view.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function build_cache_actions(): array {
+		return array(
+			'postUrl'   => admin_url( 'admin-post.php' ),
+			'clearAll'  => array(
+				'action' => 'vkp_clear_cache',
+				'nonce'  => wp_create_nonce( 'vkp_clear_cache' ),
+			),
+			'clearItem' => array(
+				'action' => 'vkp_clear_album_cache',
+				'nonce'  => wp_create_nonce( 'vkp_clear_album_cache' ),
+			),
+		);
+	}
+
+	/**
 	 * Resolve cache directory path.
 	 *
 	 * @return string Cache directory.
@@ -299,67 +332,16 @@ class AlbumsService implements AlbumsViewData {
 	/**
 	 * Calculate album cache size in megabytes.
 	 *
-	 * @param int  $account_id Account id without sign.
-	 * @param bool $is_group   Whether account is group.
-	 * @param int  $album_id   Album id.
+	 * @param int $owner_id Owner id with sign.
+	 * @param int $album_id Album id.
 	 * @return float|null Cache size or null if not calculated.
 	 */
-	private function get_album_cache_size_mb( int $account_id, bool $is_group, int $album_id ): ?float {
-		if ( ! $this->should_calculate_cache ) {
-			return null;
-		}
-
-		$owner_dir = $is_group ? '-' . abs( $account_id ) : (string) $account_id;
-
-		$path = rtrim( $this->cache_dir, '/\\' ) . '/' . $owner_dir . '/' . $album_id;
-
-		$size = $this->dir_size( $path );
+	private function get_album_cache_size_mb( int $owner_id, int $album_id ): ?float {
+		$size = $this->cache_service->size( $owner_id, $album_id );
 		if ( null === $size ) {
 			return null;
 		}
 
 		return round( $size / 1024 / 1024, 2 );
-	}
-
-	/**
-	 * Recursively calculate directory size.
-	 *
-	 * @param string $dir Directory path.
-	 * @return int|null Size in bytes or null if unavailable.
-	 */
-	private function dir_size( string $dir ): ?int {
-		if ( ! file_exists( $dir ) ) {
-			return null;
-		}
-
-		$total  = 0;
-		$handle = @opendir( $dir );
-		if ( ! $handle ) {
-			return null;
-		}
-
-		while ( false !== ( $entry = readdir( $handle ) ) ) {
-			if ( '.' === $entry || '..' === $entry ) {
-				continue;
-			}
-
-			$path = $dir . '/' . $entry;
-
-			if ( is_dir( $path ) ) {
-				$child_size = $this->dir_size( $path );
-				if ( null !== $child_size ) {
-					$total += $child_size;
-				}
-				continue;
-			}
-
-			if ( is_file( $path ) ) {
-				$total += filesize( $path );
-			}
-		}
-
-		closedir( $handle );
-
-		return $total;
 	}
 }

@@ -12,7 +12,6 @@ namespace VkPhotos\Models;
 class Album {
 	/**
 	 * Album ID.
-	 * Can be 'aid' (old format) or 'id' (new format).
 	 *
 	 * @var int
 	 */
@@ -68,7 +67,7 @@ class Album {
 	 * @return void
 	 */
 	public function __construct( array $data = array() ) {
-		$this->id          = isset( $data['aid'] ) ? (int) $data['aid'] : 0;
+		$this->id          = isset( $data['id'] ) ? (int) $data['id'] : 0;
 		$this->title       = isset( $data['title'] ) ? $data['title'] : '';
 		$this->description = isset( $data['description'] ) ? $data['description'] : '';
 		$this->owner_id    = isset( $data['owner_id'] ) ? (int) $data['owner_id'] : 0;

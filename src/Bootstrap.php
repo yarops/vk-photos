@@ -14,9 +14,13 @@ use VkPhotos\Api\VkApiClientInterface;
 use VkPhotos\Api\VkApiClientImpl;
 use VkPhotos\Services\SettingsService;
 use VkPhotos\Services\AlbumsService;
+use VkPhotos\Services\PhotoService;
+use VkPhotos\Services\CacheService;
+use VkPhotos\Services\CacheServiceInterface;
 use VkPhotos\Models\Settings as SettingsModel;
 use VkPhotos\Repositories\AlbumRepository;
 use VkPhotos\Repositories\PhotoRepository;
+use VkPhotos\Repositories\CacheRepository;
 use VkPhotos\Interfaces\AlbumsViewData;
 use VkPhotos\Hooks\AdminHooks;
 use VkPhotos\Hooks\AlbumShortcode;
@@ -123,6 +127,36 @@ class Bootstrap {
 			}
 		);
 
+		// Bind cache repository.
+		Container::singleton(
+			CacheRepository::class,
+			function (): CacheRepository {
+				return new CacheRepository();
+			}
+		);
+
+		// Bind cache service.
+		Container::singleton(
+			CacheServiceInterface::class,
+			function (): CacheServiceInterface {
+				return new CacheService(
+					Container::make( CacheRepository::class ),
+					Container::make( SettingsService::class )
+				);
+			}
+		);
+
+		// Bind photo service.
+		Container::singleton(
+			PhotoService::class,
+			function (): PhotoService {
+				return new PhotoService(
+					Container::make( PhotoRepository::class ),
+					Container::make( CacheServiceInterface::class )
+				);
+			}
+		);
+
 		// Bind albums service.
 		Container::singleton(
 			AlbumsService::class,
@@ -130,7 +164,8 @@ class Bootstrap {
 				return new AlbumsService(
 					Container::make( SettingsService::class ),
 					Container::make( VkApiClientInterface::class ),
-					Container::make( AlbumRepository::class )
+					Container::make( AlbumRepository::class ),
+					Container::make( CacheServiceInterface::class )
 				);
 			}
 		);

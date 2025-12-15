@@ -9,6 +9,7 @@ use VkPhotos\Container;
 use VkPhotos\Views\Admin\SettingsView;
 use VkPhotos\Services\SettingsService;
 use VkPhotos\Api\VkApiClientInterface;
+use VkPhotos\Controllers\Admin\CacheController;
 
 /**
  * Class AdminHooks.
@@ -23,6 +24,8 @@ class AdminHooks {
 	 */
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'register_admin_pages' ) );
+		add_action( 'admin_post_vkp_clear_cache', array( $this, 'handle_clear_cache' ) );
+		add_action( 'admin_post_vkp_clear_album_cache', array( $this, 'handle_clear_album_cache' ) );
 	}
 
 	/**
@@ -115,5 +118,25 @@ class AdminHooks {
 		// Use AlbumsView to render albums page.
 		$albums_view = new \VkPhotos\Views\Admin\AlbumsView();
 		$albums_view->render();
+	}
+
+	/**
+	 * Handle cache purge action.
+	 *
+	 * @return void
+	 */
+	public function handle_clear_cache(): void {
+		$controller = Container::make( CacheController::class );
+		$controller->clear_all();
+	}
+
+	/**
+	 * Handle album cache purge action.
+	 *
+	 * @return void
+	 */
+	public function handle_clear_album_cache(): void {
+		$controller = Container::make( CacheController::class );
+		$controller->clear_album();
 	}
 }

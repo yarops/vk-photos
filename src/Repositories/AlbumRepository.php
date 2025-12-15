@@ -173,9 +173,8 @@ class AlbumRepository {
 		}
 
 		// Normalize data format.
-		// Handle both 'id' and 'aid' fields.
 		$normalized = array(
-			'id'          => isset( $data['aid'] ) ? (int) $data['aid'] : ( isset( $data['id'] ) ? (int) $data['id'] : 0 ),
+			'id'          => isset( $data['id'] ) ? (int) $data['id'] : 0,
 			'owner_id'    => isset( $data['owner_id'] ) ? (int) $data['owner_id'] : 0,
 			'title'       => isset( $data['title'] ) ? (string) $data['title'] : '',
 			'description' => isset( $data['description'] ) ? (string) $data['description'] : '',
