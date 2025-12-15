@@ -70,12 +70,6 @@ class Bootstrap {
 			Config::get( 'paths.languages' )
 		);
 
-		// Load main class.
-		$main_class_path = Config::get( 'paths.inc' ) . 'class.main.php';
-		if ( file_exists( $main_class_path ) ) {
-			require_once $main_class_path;
-		}
-
 		// Register hooks.
 		$this->register_hooks();
 
@@ -83,30 +77,12 @@ class Bootstrap {
 		if ( is_admin() ) {
 			new AdminHooks();
 		}
-
-		// Initialize main plugin class.
-		if ( class_exists( 'VkPhotos' ) ) {
-			// Try to resolve from container, fallback to direct instantiation.
-			if ( Container::bound( 'VkPhotos' ) ) {
-				Container::make( 'VkPhotos' );
-			} else {
-				new \VkPhotos();
-			}
-		}
 	}
 
 	/**
 	 * Initialize service container and bind services.
 	 */
 	private function init_container(): void {
-		// Bind main plugin class as singleton.
-		Container::singleton(
-			'VkPhotos',
-			function (): \VkPhotos {
-				return new \VkPhotos();
-			}
-		);
-
 		// Bind VK API client.
 		Container::singleton(
 			VkApiClientInterface::class,
@@ -182,10 +158,6 @@ class Bootstrap {
 				$settings_service->register_settings();
 			}
 		);
-
-		// Register query vars and template redirect.
-		add_filter( 'query_vars', 'vkp_add_trigger' );
-		add_action( 'template_redirect', 'vkp_next_page' );
 
 		// Register scripts and styles.
 		add_action( 'wp_enqueue_scripts', 'vkp_scripts_register' );

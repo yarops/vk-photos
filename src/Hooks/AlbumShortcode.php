@@ -211,13 +211,12 @@ class AlbumShortcode {
 	 * @return string
 	 */
 	private function normalize_size( string $requested, string $fallback ): string {
-		$normalized = trPictureSize( $requested );
+		$normalized = $requested;
 		if ( in_array( $normalized, $this->available_sizes, true ) ) {
 			return $normalized;
 		}
 
-		$fallback_normalized = trPictureSize( $fallback );
-		return in_array( $fallback_normalized, $this->available_sizes, true ) ? $fallback_normalized : 'photo_130';
+		return in_array( $fallback, $this->available_sizes, true ) ? $fallback : 'photo_130';
 	}
 
 	/**
