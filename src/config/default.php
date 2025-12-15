@@ -26,7 +26,11 @@ return function ( string $plugin_file ): array {
 		),
 		'paths'  => array(
 			'inc'       => $plugin_dir . 'inc/',
-			'templates' => $plugin_dir . 'templates/',
+			'templates' => array(
+				'root'     => $plugin_dir . 'templates/',
+				'admin'    => $plugin_dir . 'templates/admin/',
+				'frontend' => $plugin_dir . 'templates/frontend/',
+			),
 			'languages' => $plugin_dir . 'languages/',
 			'api'       => $plugin_dir . 'api/',
 		),

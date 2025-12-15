@@ -86,7 +86,7 @@ class AlbumsView {
 	 * @return string Plugin directory path.
 	 */
 	public function get_plugin_dir(): string {
-		return defined( 'VKP__PLUGIN_DIR' ) ? VKP__PLUGIN_DIR : Config::get( 'plugin.dir', '' );
+		return Config::get( 'plugin.dir', '' );
 	}
 
 	/**
@@ -95,16 +95,16 @@ class AlbumsView {
 	 * @return string Plugin URL.
 	 */
 	public function get_plugin_url(): string {
-		return defined( 'VKP__PLUGIN_URL' ) ? VKP__PLUGIN_URL : Config::get( 'plugin.url', '' );
+		return Config::get( 'plugin.url', '' );
 	}
 
 	/**
-	 * Get albums directory.
+	 * Get templates directory.
 	 *
-	 * @return string Albums directory path.
+	 * @return string Templates directory path.
 	 */
 	public function get_templates_dir(): string {
-		return $this->get_plugin_dir() . 'templates';
+		return Config::get( 'paths.templates.root', '' );
 	}
 
 	/**
@@ -114,9 +114,8 @@ class AlbumsView {
 	 * @return void
 	 */
 	private function load_template( array $view_data = array() ): void {
-		// Get plugin directory from config or constant.
-		$plugin_dir  = defined( 'VKP__PLUGIN_DIR' ) ? VKP__PLUGIN_DIR : Config::get( 'plugin.dir', '' );
-		$albums_path = $plugin_dir . 'templates/admin/albums-view.php';
+		// Get admin templates path from config.
+		$albums_path = Config::get( 'paths.templates.admin', '' ) . 'albums-view.php';
 
 		if ( ! file_exists( $albums_path ) ) {
 			echo '<div class="wrap"><p>' . esc_html__( 'Albums file not found.', 'vkp' ) . '</p></div>';

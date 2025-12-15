@@ -190,9 +190,8 @@ class SettingsView {
 	 * @return void
 	 */
 	private function load_template(): void {
-		// Get plugin directory from config or constant.
-		$plugin_dir    = defined( 'VKP__PLUGIN_DIR' ) ? VKP__PLUGIN_DIR : Config::get( 'plugin.dir', '' );
-		$template_path = $plugin_dir . 'templates/admin/settings-view.php';
+		// Get admin templates path from config.
+		$template_path = Config::get( 'paths.templates.admin', '' ) . 'settings-view.php';
 
 		if ( ! file_exists( $template_path ) ) {
 			echo '<div class="wrap"><p>' . esc_html__( 'Template file not found.', 'vkp' ) . '</p></div>';

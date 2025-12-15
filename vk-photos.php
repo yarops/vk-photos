@@ -28,22 +28,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Define plugin constants.
-define( 'VKP__PLUGIN_FILE', __FILE__ );
-define( 'VKP__PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'VKP__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-
 // Load Composer autoloader.
-if ( file_exists( VKP__PLUGIN_DIR . 'vendor/autoload.php' ) ) {
-	require_once VKP__PLUGIN_DIR . 'vendor/autoload.php';
+$plugin_dir = plugin_dir_path( __FILE__ );
+if ( file_exists( $plugin_dir . 'vendor/autoload.php' ) ) {
+	require_once $plugin_dir . 'vendor/autoload.php';
 }
 
 // Load helper functions.
-require_once VKP__PLUGIN_DIR . 'functions.php';
+require_once $plugin_dir . 'functions.php';
 
 // Initialize plugin.
 use VkPhotos\Bootstrap;
 
 Bootstrap::get_instance();
-
-

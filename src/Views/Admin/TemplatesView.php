@@ -29,7 +29,7 @@ class TemplatesView {
 	 * @return string Plugin directory path.
 	 */
 	public function get_plugin_dir(): string {
-		return defined( 'VKP__PLUGIN_DIR' ) ? VKP__PLUGIN_DIR : Config::get( 'plugin.dir', '' );
+		return Config::get( 'plugin.dir', '' );
 	}
 
 	/**
@@ -38,7 +38,7 @@ class TemplatesView {
 	 * @return string Plugin URL.
 	 */
 	public function get_plugin_url(): string {
-		return defined( 'VKP__PLUGIN_URL' ) ? VKP__PLUGIN_URL : Config::get( 'plugin.url', '' );
+		return Config::get( 'plugin.url', '' );
 	}
 
 	/**
@@ -47,7 +47,7 @@ class TemplatesView {
 	 * @return string Templates directory path.
 	 */
 	public function get_templates_dir(): string {
-		return $this->get_plugin_dir() . 'templates';
+		return Config::get( 'paths.templates.frontend', '' );
 	}
 
 	/**
@@ -79,9 +79,8 @@ class TemplatesView {
 	 * @return void
 	 */
 	private function load_template(): void {
-		// Get plugin directory from config or constant.
-		$plugin_dir    = defined( 'VKP__PLUGIN_DIR' ) ? VKP__PLUGIN_DIR : Config::get( 'plugin.dir', '' );
-		$template_path = $plugin_dir . 'templates/admin/templates-view.php';
+		// Get admin templates path from config.
+		$template_path = Config::get( 'paths.templates.admin', '' ) . 'templates-view.php';
 
 		if ( ! file_exists( $template_path ) ) {
 			echo '<div class="wrap"><p>' . esc_html__( 'Template file not found.', 'vkp' ) . '</p></div>';

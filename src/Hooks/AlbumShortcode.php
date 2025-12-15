@@ -6,6 +6,7 @@
 namespace VkPhotos\Hooks;
 
 use VkPhotos\Api\VkApiClientInterface;
+use VkPhotos\Config;
 use VkPhotos\Container;
 use VkPhotos\Models\Photo as PhotoModel;
 use VkPhotos\Repositories\AlbumRepository;
@@ -165,14 +166,16 @@ class AlbumShortcode {
 			$output .= wp_kses_post( $album->description ) . '<br>';
 		}
 
-		$template_dir   = VKP__PLUGIN_DIR . 'templates/' . $atts['template'] . '/';
-		$template_style = @file_get_contents( VKP__PLUGIN_URL . 'templates/' . $atts['template'] . '/style.html' );
-		$template_head  = @file_get_contents( $template_dir . 'header.html' );
-		$template_item  = @file_get_contents( $template_dir . 'item.html' );
-		$template_foot  = @file_get_contents( $template_dir . 'footer.html' );
+		$templates_frontend_dir = Config::get( 'paths.templates.frontend', '' );
+		$plugin_url             = Config::get( 'plugin.url', '' );
+		$template_dir           = $templates_frontend_dir . $atts['template'] . '/';
+		$template_style         = @file_get_contents( $plugin_url . 'templates/frontend/' . $atts['template'] . '/style.html' );
+		$template_head          = @file_get_contents( $template_dir . 'header.html' );
+		$template_item          = @file_get_contents( $template_dir . 'item.html' );
+		$template_foot          = @file_get_contents( $template_dir . 'footer.html' );
 
 		$output .= str_replace( '[[ID]]', $album_id, $template_style );
-		$output  = str_replace( '[[DIRECTORY_PLUGIN]]', VKP__PLUGIN_URL, $output );
+		$output  = str_replace( '[[DIRECTORY_PLUGIN]]', $plugin_url, $output );
 
 		$output .= str_replace( '[[ID]]', $album_id, (string) $template_head );
 

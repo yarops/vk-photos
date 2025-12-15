@@ -53,7 +53,7 @@
 					<select name='vkpTemplate'>
 					<?php
 						// ищем список шаблонов
-						$dir = VKP__PLUGIN_DIR . 'templates';
+						$dir = \VkPhotos\Config::get( 'paths.templates.frontend', '' );
 					if ( $dirstream = @opendir( $dir ) ) {
 						while ( false !== ( $filename = readdir( $dirstream ) ) ) {
 							if ( $filename != '.' && $filename != '..' ) {
