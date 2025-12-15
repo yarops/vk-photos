@@ -16,8 +16,10 @@ use VkPhotos\Services\SettingsService;
 use VkPhotos\Services\AlbumsService;
 use VkPhotos\Models\Settings as SettingsModel;
 use VkPhotos\Repositories\AlbumRepository;
+use VkPhotos\Repositories\PhotoRepository;
 use VkPhotos\Interfaces\AlbumsViewData;
 use VkPhotos\Hooks\AdminHooks;
+use VkPhotos\Hooks\AlbumShortcode;
 
 /**
  * Class Bootstrap.
@@ -137,6 +139,14 @@ class Bootstrap {
 			}
 		);
 
+		// Bind photo repository.
+		Container::singleton(
+			PhotoRepository::class,
+			function (): PhotoRepository {
+				return new PhotoRepository( Container::make( VkApiClientInterface::class ) );
+			}
+		);
+
 		// Bind albums service.
 		Container::singleton(
 			AlbumsService::class,
@@ -179,5 +189,13 @@ class Bootstrap {
 
 		// Register scripts and styles.
 		add_action( 'wp_enqueue_scripts', 'vkp_scripts_register' );
+
+		// Register album shortcode.
+		add_action(
+			'init',
+			function (): void {
+				Container::make( AlbumShortcode::class );
+			}
+		);
 	}
 }

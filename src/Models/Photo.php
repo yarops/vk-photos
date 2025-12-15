@@ -11,6 +11,12 @@ namespace VkPhotos\Models;
  */
 class Photo {
 	/**
+	 * Photo sizes map.
+	 *
+	 * @var array<string, string>
+	 */
+	public array $sizes = array();
+	/**
 	 * Photo ID.
 	 * Can be 'aid' (old format) or 'id' (new format).
 	 *
@@ -89,6 +95,9 @@ class Photo {
 		$this->text     = isset( $data['text'] ) ? $data['text'] : '';
 		$this->date     = isset( $data['date'] ) ? (int) $data['date'] : 0;
 
+		// Sizes map: keyed by VK type (s,m,x,y,z,w,r,q,p,k,l, etc) and legacy photo_XXX keys.
+		$this->sizes = isset( $data['sizes'] ) && is_array( $data['sizes'] ) ? $data['sizes'] : array();
+
 		// Handle orig_photo data.
 		if ( isset( $data['orig_photo'] ) && is_array( $data['orig_photo'] ) ) {
 			$this->orig_photo_url    = $data['orig_photo']['url'] ?? '';
@@ -126,6 +135,34 @@ class Photo {
 	}
 
 	/**
+	 * Get photo URL by requested size key.
+	 *
+	 * @param string $size_key Size key (e.g. photo_130, photo_807, x, y).
+	 * @return string
+	 */
+	public function get_size_url( string $size_key ): string {
+		if ( isset( $this->sizes[ $size_key ] ) ) {
+			return (string) $this->sizes[ $size_key ];
+		}
+
+		// Map legacy photo_XXX to VK short types.
+		$map = array(
+			'photo_75'   => 's',
+			'photo_130'  => 'm',
+			'photo_604'  => 'x',
+			'photo_807'  => 'y',
+			'photo_1280' => 'z',
+			'photo_2560' => 'w',
+		);
+
+		if ( isset( $map[ $size_key ] ) && isset( $this->sizes[ $map[ $size_key ] ] ) ) {
+			return (string) $this->sizes[ $map[ $size_key ] ];
+		}
+
+		return $this->orig_photo_url ?? '';
+	}
+
+	/**
 	 * Convert photo to array.
 	 *
 	 * @return array Photo data as array.
@@ -137,6 +174,7 @@ class Photo {
 			'album_id'   => $this->album_id,
 			'text'       => $this->text,
 			'date'       => $this->date,
+			'sizes'      => $this->sizes,
 			'orig_photo' => array(
 				'url'    => $this->orig_photo_url,
 				'width'  => $this->orig_photo_width,

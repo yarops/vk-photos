@@ -1,4 +1,12 @@
 <?php
+
+use VkPhotos\Api\VkApiClientInterface;
+use VkPhotos\Container;
+use VkPhotos\Models\Photo as PhotoModel;
+use VkPhotos\Repositories\AlbumRepository;
+use VkPhotos\Repositories\PhotoRepository;
+use VkPhotos\Services\SettingsService;
+
 class VkPhotos {
 
 	// Properties declaration to avoid PHP 8.2+ dynamic property deprecation warnings.
@@ -35,7 +43,6 @@ class VkPhotos {
 			add_action( 'admin_menu', array( $this, 'vkphotos_add_menu' ) );
 		}
 
-		add_shortcode( 'vkalbum', array( $this, 'vk_album_shortcode' ) );
 		//
 		// ПЕРЕМЕННЫЕ И КОНСТАНТЫ
 		$this->upload_dir  = wp_upload_dir();
@@ -230,29 +237,7 @@ class VkPhotos {
 			</div>
 		<?php
 	}
-	//
-	// шорткод
-	public function vk_album_shortcode( $atts ) {
 
-			extract(
-				shortcode_atts(
-					array(
-						'cache' => $this->vkpEnableCaching,
-					),
-					$atts
-				)
-			);
-
-		if ( $cache == 'yes' ) {
-			// проверка и создание кеша
-			$this->vk_album_create_cache( $atts );
-			// отображение альбома из кеша
-			$output = $this->show_album_from( $atts, 'cache' );
-		} else {
-			$output = $this->show_album_from( $atts, 'vk' );
-		}
-		return $output;
-	}
 
 	//
 	// создание кеша альбома
@@ -431,166 +416,34 @@ class VkPhotos {
 
 		return $output;
 	}
+
+
 	/**
-		//////////////////////////////////////////////////////////
-		// функция отображения альбома, из кеша и из контакта
-	 **/
-	public function show_album_from( $atts, $from ) {
+	 * Get photo URL by size with fallback.
+	 *
+	 * @param PhotoModel $photo_model Photo model.
+	 * @param string     $size_key    Size key.
+	 * @return string
+	 */
+	private function get_photo_url( PhotoModel $photo_model, string $size_key ): string {
+		return $photo_model->get_size_url( $size_key );
+	}
 
-		// получение параметров и определение переменных
-		extract(
-			shortcode_atts(
-				array(
-					'id'       => 'no',
-					'owner'    => 'no',
-					'template' => $this->vkpTemplate,
-					'viewer'   => $this->vkpViewer,
-					'sign'     => $this->vkpShowSignatures,
-					'count'    => $this->vkpCountPhotos,
-					'preview'  => $this->vkpPreviewSize,
-					'photo'    => $this->vkpPhotoViewSize,
-				),
-				$atts
-			)
-		);
-
-		$preview = trPictureSize( $preview );
-		$photo   = trPictureSize( $photo );
-
-		if ( ! in_array( $preview, $this->arrayPictureSize ) ) {
-			$preview = $this->vkpPreviewSize;
+	/**
+	 * Set VK API token if supported by client.
+	 *
+	 * @param VkApiClientInterface $client API client.
+	 * @param string               $token  Access token.
+	 * @return void
+	 */
+	private function set_api_token( VkApiClientInterface $client, string $token ): void {
+		if ( empty( $token ) ) {
+			return;
 		}
 
-		if ( ! in_array( $photo, $this->arrayPictureSize ) ) {
-			$photo = $this->vkpPhotoViewSize;
+		if ( property_exists( $client, 'access_token' ) ) {
+			$client->access_token = $token;
 		}
-
-		$templateViewer = '';
-		$output         = '';
-
-		// проверяем а не с мобильного ли устройства зашел пользователь
-		// использовать специальный просмотрщик для мобильных платформ
-
-		// if(wp_is_mobile()){
-		//
-		// }else{
-					// инициируем колорбокс
-		if ( $viewer == 'colorbox' ) {
-			wp_enqueue_script( 'vkp_colorbox' );
-			wp_enqueue_style( 'vkp_colorbox' );
-			$templateViewer = ' class="vkpcolorbox"';
-		}
-		if ( $viewer == 'swipebox' ) {
-			wp_enqueue_script( 'vkp_swipebox' );
-			wp_enqueue_style( 'vkp_swipebox' );
-			$templateViewer = ' class="swipebox"';
-		}
-
-		// }
-
-		// заголовок галереи показываем или описание?
-		if ( $this->vkpShowTitle == 'yes' or $this->vkpShowDescription == 'yes' ) {
-
-			// получаем альбом(файл описания) из кеша или из vk.com
-			if ( $from == 'cache' ) {
-				$album = @file_get_contents( $this->dirForCache . $owner . '/' . $id . '/description.album' );
-				$album = unserialize( $album );
-			}
-			if ( $from == 'vk' ) {
-				$album = $this->VKP->api(
-					'photos.getAlbums',
-					array(
-						'access_token' => $this->vkpAccessToken,
-						'album_ids'    => $id,
-						'owner_id'     => $owner,
-					)
-				);
-			}
-
-			if ( is_array( $album ) && isset( $album['response'] ) && isset( $album['response']['items'] ) && is_array( $album['response']['items'] ) && ! empty( $album['response']['items'][0] ) ) {
-				if ( $this->vkpShowTitle == 'yes' ) {
-					$output .= '<h2>' . $album['response']['items'][0]['title'] . '</h2>';
-				}
-				if ( $this->vkpShowDescription == 'yes' ) {
-					$output .= $album['response']['items'][0]['description'] . '<br>';
-				}
-			}
-		}
-
-		// получим части шаблона
-		$templateStyle = @file_get_contents( VKP__PLUGIN_URL . 'templates/' . $template . '/style.html' );
-		$output       .= str_replace( '[[ID]]', $id, $templateStyle );
-		$output        = str_replace( '[[DIRECTORY_PLUGIN]]', VKP__PLUGIN_URL, $output );
-		$output       .= '
-			<script>
-				function nextPage_' . $id . "(page){
-					jQuery.post('" . get_home_url() . "', {
-						vkp: 'next-page',
-						from: '" . $from . "',
-						id: '" . $id . "',
-						owner: '" . $owner . "',
-						template: '" . $template . "',
-						sign: '" . $sign . "',
-						viewer: '" . $viewer . "',
-						page: page,
-						count: '" . $count . "',
-						vkpShowTitle: '" . $this->vkpShowTitle . "',
-						vkpShowDescription: '" . $this->vkpShowDescription . "',
-						templateViewer: '" . $templateViewer . "',
-						vkpPreviewSize: '" . $preview . "',
-						vkpPhotoViewSize: '" . $photo . "',
-						more: '" . __( 'more', 'vkp' ) . "'
-					},
-					function(data){
-						if (data) {
-							document.getElementById('more" . $owner . $id . "').outerHTML = data;
-						";
-
-		if ( $template == 'fresh' ) {
-			// таблетка для шаблона FRESH (переинициализация после ajax)
-			$output .= "
-				var mosaic = jQuery( '.mosaicflow' ).mosaicflow( {
-					itemSelector: '.mosaicflow__item',
-					minItemWidth: 220
-				});
-				mosaic.mosaicflow('refill');
-				";
-		}
-
-		if ( $viewer == 'colorbox' ) {
-			// таблетка для colorbox (переинициализация после ajax)
-			$output .= "
-				jQuery('.vkpcolorbox').colorbox({rel:'vkpcolorbox', slideshow:false});
-			";
-		}
-		if ( $viewer == 'swipebox' ) {
-			// таблетка для swipebox
-			$output .= "
-			;( function( $ ) {
-				jQuery( '.swipebox' ).swipebox(
-					{
-						useSVG : false,
-						ideBarsDelay : 9000,
-						useCSS : true
-					}
-					);
-
-				} )( jQuery );
-			";
-		}
-
-		$output .= "
-					}
-				}, 'html');
-			}
-			nextPage_" . $id . '(1);
-
-			</script>
-			';
-
-		$output .= "<div id='more" . $owner . $id . "'></div>";
-
-		return $output;
 	}
 
 	//

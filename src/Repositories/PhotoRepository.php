@@ -35,9 +35,10 @@ class PhotoRepository {
 	 * Get photos by album ID.
 	 *
 	 * @param int $album_id Album ID.
+	 * @param int $owner_id Owner ID.
 	 * @return array<Photo> Array of Photo models.
 	 */
-	public function get_photos( int $album_id ): array {
+	public function get_photos( int $album_id, int $owner_id ): array {
 		$photos = array();
 
 		try {
@@ -45,6 +46,7 @@ class PhotoRepository {
 				'photos.get',
 				array(
 					'album_id' => $album_id,
+					'owner_id' => $owner_id,
 				)
 			);
 
@@ -142,9 +144,11 @@ class PhotoRepository {
 		// Handle both 'id' and 'aid' fields.
 		$normalized = array(
 			'id'         => isset( $data['aid'] ) ? (int) $data['aid'] : ( isset( $data['id'] ) ? (int) $data['id'] : 0 ),
+			'owner_id'   => isset( $data['owner_id'] ) ? (int) $data['owner_id'] : 0,
 			'album_id'   => isset( $data['album_id'] ) ? (int) $data['album_id'] : 0,
 			'text'       => isset( $data['text'] ) ? (string) $data['text'] : '',
 			'date'       => isset( $data['date'] ) ? (int) $data['date'] : 0,
+			'sizes'      => $this->build_sizes_map( $data ),
 			'orig_photo' => isset( $data['orig_photo'] ) ? (array) $data['orig_photo'] : array(),
 		);
 
@@ -154,5 +158,35 @@ class PhotoRepository {
 		}
 
 		return new Photo( $normalized );
+	}
+
+	/**
+	 * Build sizes map from API response data.
+	 *
+	 * @param array $data Photo data.
+	 * @return array<string, string>
+	 */
+	private function build_sizes_map( array $data ): array {
+		$map = array();
+
+		// Legacy fields photo_XXX.
+		$legacy_fields = array( 'photo_75', 'photo_130', 'photo_604', 'photo_807', 'photo_1280', 'photo_2560' );
+		foreach ( $legacy_fields as $field ) {
+			if ( isset( $data[ $field ] ) && ! empty( $data[ $field ] ) ) {
+				$map[ $field ] = (string) $data[ $field ];
+			}
+		}
+
+		// Sizes array from modern VK API.
+		if ( isset( $data['sizes'] ) && is_array( $data['sizes'] ) ) {
+			foreach ( $data['sizes'] as $size ) {
+				if ( ! isset( $size['type'] ) || ! isset( $size['url'] ) ) {
+					continue;
+				}
+				$map[ (string) $size['type'] ] = (string) $size['url'];
+			}
+		}
+
+		return $map;
 	}
 }
