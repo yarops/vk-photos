@@ -1,8 +1,10 @@
 <?xml version="1.0"?>
 <psalm errorLevel="5" resolveFromConfigFile="true" xmlOutput="./psalm-report.xml" xmlOutputFile="./psalm-report.xml" cacheDirectory="./.psalm-cache" useDocblockTypes="true" findUnusedBaselineEntry="false" findUnusedCode="false">
+	<stubs>
+		<file name="vendor/php-stubs/wordpress-stubs/wordpress-stubs.php"/>
+	</stubs>
 	<projectFiles>
 		<directory name="src"/>
-		<directory name="inc"/>
 		<directory name="api"/>
 		<file name="vk-photos.php"/>
 		<file name="functions.php"/>

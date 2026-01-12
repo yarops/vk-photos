@@ -20,7 +20,7 @@
 	<exclude-pattern>*.min.css</exclude-pattern>
 
 	<!-- How to scan. -->
-	<arg value="extensions=php"/>
+	<arg name="extensions" value="php"/>
 	<arg name="basepath" value="./"/>
 	<arg name="colors"/>
 	<arg name="warning-severity" value="0"/>

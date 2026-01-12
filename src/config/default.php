@@ -20,12 +20,11 @@ return function ( string $plugin_file ): array {
 			'file'        => $plugin_file,
 			'dir'         => $plugin_dir,
 			'url'         => $plugin_url,
-			'version'     => '1.5',
+			'version'     => get_file_data( $plugin_file, array( 'Version' => 'Version' ) ),
 			'text_domain' => 'vkp',
 			'basename'    => plugin_basename( $plugin_file ),
 		),
 		'paths'  => array(
-			'inc'       => $plugin_dir . 'inc/',
 			'templates' => array(
 				'root'     => $plugin_dir . 'templates/',
 				'admin'    => $plugin_dir . 'templates/admin/',
