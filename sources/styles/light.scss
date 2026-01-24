@@ -1,0 +1,54 @@
+// Light template styles
+// Note: [[ID]] placeholder is replaced in templates with actual ID
+// Classes like .container123, .galleryItem123 are generated dynamically
+// Using attribute selectors to match any class containing the base name
+
+[class*='container'] {
+	width: 96%;
+	margin: 10px auto;
+	overflow: hidden;
+}
+
+[class*='galleryItem'] {
+	color: #797478;
+	font: 8pt/1.5 Verdana, Helvetica, sans-serif;
+	float: left;
+	width: 23%;
+	margin: 1% 1% 1% 1%;
+	display: block;
+
+	& img {
+		max-width: 100%;
+		border-radius: 5px;
+	}
+}
+
+// Media queries
+@media only screen and (max-width: 940px),
+	only screen and (max-device-width: 940px) {
+	[class*='galleryItem'] {
+		width: 30%;
+	}
+}
+
+@media only screen and (max-width: 720px),
+	only screen and (max-device-width: 720px) {
+	[class*='galleryItem'] {
+		width: 46%;
+	}
+}
+
+@media only screen and (max-width: 330px),
+	only screen and (max-device-width: 330px) {
+	[class*='galleryItem'] {
+		width: 96%;
+
+		& img {
+			width: 96%;
+		}
+
+		& p {
+			font-size: 10pt;
+		}
+	}
+}

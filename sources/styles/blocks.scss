@@ -1,0 +1,65 @@
+// Blocks template styles
+// Note: [[ID]] placeholder is replaced in templates with actual ID
+// Classes like .container123, .galleryItem123 are generated dynamically
+// Using attribute selectors to match any class containing the base name
+
+[class*='container'] {
+	width: 100%;
+	display: inline-block;
+}
+
+[class*='galleryItem'] {
+	max-width: 100%;
+
+	& a {
+		color: #4c6b8f;
+		text-decoration: none;
+		cursor: pointer;
+	}
+}
+
+// Media queries - mobile first
+[class*='galleryItem'] {
+	min-height: 40px;
+	height: 97px;
+	max-width: 130px;
+	max-height: 97px;
+	width: 46%;
+	margin: 1%;
+	text-align: center;
+	overflow: hidden;
+	position: relative;
+	display: inline-block;
+	vertical-align: top;
+	float: left;
+
+	@media screen and (min-width: 140px) {
+		width: 48%;
+		max-height: 73px;
+		margin: 1%;
+	}
+
+	@media screen and (min-width: 270px) {
+		width: 32%;
+		max-height: 69px;
+		margin: 0.65%;
+	}
+
+	@media screen and (min-width: 400px) {
+		width: 24%;
+		max-height: 77px;
+		margin: 0.5%;
+	}
+
+	@media screen and (min-width: 540px) {
+		width: 19%;
+		max-height: 76px;
+		margin: 0.5%;
+	}
+
+	@media screen and (min-width: 690px) {
+		width: 16%;
+		max-height: 86px;
+		margin: 0.32%;
+	}
+}

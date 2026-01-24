@@ -1,0 +1,52 @@
+// Fresh template styles
+// Note: This template uses fixed class names (group, mosaicflow) without ID placeholders
+
+.group {
+	&:before,
+	&:after {
+		content: ' ';
+		display: table;
+	}
+
+	&:after {
+		clear: both;
+	}
+}
+
+.mosaicflow {
+	margin-bottom: 40px;
+}
+
+.mosaicflow__column {
+	float: left;
+}
+
+.mosaicflow__item {
+	position: relative;
+
+	& img {
+		display: block;
+		width: 100%;
+		max-width: 400px;
+		height: auto;
+	}
+
+	& p {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 96%;
+		margin: 0;
+		padding: 5px;
+		background: hsla(0, 0%, 0%, 0.5);
+		color: #fff;
+		font-size: 14px;
+		text-shadow: 1px 1px 1px hsla(0, 0%, 0%, 0.75);
+		opacity: 0;
+		transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+	}
+
+	&:hover p {
+		opacity: 1;
+	}
+}

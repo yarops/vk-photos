@@ -22,6 +22,7 @@ env.json
 .vscode/
 .cursor/
 .idea/
+.kilokode/
 *.swp
 *.swo
 *~

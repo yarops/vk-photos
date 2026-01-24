@@ -9,6 +9,10 @@
 namespace VkPhotos\Services;
 
 use VkPhotos\Config;
+use VkPhotos\Interfaces\TemplateConfigInterface;
+use VkPhotos\Configs\Templates\FreshTemplateConfig;
+use VkPhotos\Configs\Templates\LightTemplateConfig;
+use VkPhotos\Configs\Templates\BlocksTemplateConfig;
 
 /**
  * Class TemplateService.
@@ -31,11 +35,105 @@ class TemplateService {
 	private string $templates_path;
 
 	/**
+	 * Template configuration instances.
+	 *
+	 * @var array<string, TemplateConfigInterface>
+	 */
+	private array $template_configs = array();
+
+	/**
 	 * Constructor.
 	 * Initializes the template service with configuration.
 	 */
 	public function __construct() {
 		$this->templates_path = Config::get( 'paths.templates.frontend', '' );
+		$this->register_template_configs();
+	}
+
+	/**
+	 * Register template configuration classes.
+	 *
+	 * @return void
+	 */
+	private function register_template_configs(): void {
+		$this->template_configs = array(
+			'fresh'  => new FreshTemplateConfig(),
+			'light'  => new LightTemplateConfig(),
+			'blocks' => new BlocksTemplateConfig(),
+		);
+	}
+
+	/**
+	 * Enqueue template assets (scripts and styles).
+	 *
+	 * @param string $template_slug Template slug.
+	 * @return void
+	 */
+	public function enqueue_template_assets( string $template_slug ): void {
+		if ( ! isset( $this->template_configs[ $template_slug ] ) ) {
+			return;
+		}
+
+		$config = $this->template_configs[ $template_slug ];
+
+		// Enqueue scripts.
+		foreach ( $config->get_scripts() as $script ) {
+			wp_enqueue_script(
+				$script['handle'],
+				$script['src'],
+				$script['deps'] ?? array(),
+				$script['version'] ?? '1.0.0',
+				$script['in_footer'] ?? false
+			);
+
+			// Add inline script if provided.
+			if ( isset( $script['inline'] ) ) {
+				wp_add_inline_script( $script['handle'], $script['inline'] );
+			}
+		}
+
+		// Enqueue styles.
+		foreach ( $config->get_styles() as $style ) {
+			wp_enqueue_style(
+				$style['handle'],
+				$style['src'],
+				$style['deps'] ?? array(),
+				$style['version'] ?? '1.0.0',
+				$style['media'] ?? 'all'
+			);
+
+			// Add inline style if provided.
+			if ( isset( $style['inline'] ) ) {
+				wp_add_inline_style( $style['handle'], $style['inline'] );
+			}
+		}
+
+		// Add inline scripts.
+		foreach ( $config->get_inline_scripts() as $inline_script ) {
+			wp_add_inline_script(
+				$inline_script['handle'] ?? 'vk-photos-' . $template_slug,
+				$inline_script['data'],
+				$inline_script['position'] ?? 'after'
+			);
+		}
+
+		// Add inline styles.
+		foreach ( $config->get_inline_styles() as $inline_style ) {
+			wp_add_inline_style(
+				$inline_style['handle'] ?? 'vk-photos-' . $template_slug . '-styles',
+				$inline_style['css']
+			);
+		}
+	}
+
+	/**
+	 * Get template configuration instance.
+	 *
+	 * @param string $template_slug Template slug.
+	 * @return TemplateConfigInterface|null Template configuration or null if not found.
+	 */
+	public function get_template_config( string $template_slug ): ?TemplateConfigInterface {
+		return $this->template_configs[ $template_slug ] ?? null;
 	}
 
 	/**
@@ -50,6 +148,8 @@ class TemplateService {
 	 * @return string Rendered template content or empty string if template not found.
 	 */
 	public function render( string $template, string $template_name, array $data = array() ): string {
+		$this->enqueue_template_assets( $template );
+
 		$template_path = $this->get_template_path( $template, $template_name );
 
 		if ( ! $this->template_exists( $template_path ) ) {
@@ -175,35 +275,5 @@ class TemplateService {
 	 */
 	public function clear_cache(): void {
 		$this->cache = array();
-	}
-
-	/**
-	 * Get list of available templates.
-	 *
-	 * Returns array of template directory names that have required files.
-	 *
-	 * @return array<int, string> Array of available template names.
-	 */
-	public function get_available_templates(): array {
-		$templates = array();
-		if ( ! is_dir( $this->templates_path ) ) {
-			return $templates;
-		}
-
-		$dirs = scandir( $this->templates_path );
-		foreach ( $dirs as $dir ) {
-			if ( '.' === $dir || '..' === $dir || ! is_dir( $this->templates_path . $dir ) ) {
-				continue;
-			}
-
-			// Check if template has required files.
-			if ( $this->template_exists( $this->templates_path . $dir . '/header.html' ) &&
-				 $this->template_exists( $this->templates_path . $dir . '/item.html' ) &&
-				 $this->template_exists( $this->templates_path . $dir . '/footer.html' ) ) {
-				$templates[] = $dir;
-			}
-		}
-
-		return $templates;
 	}
 }
