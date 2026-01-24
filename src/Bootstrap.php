@@ -17,6 +17,7 @@ use VkPhotos\Services\AlbumsService;
 use VkPhotos\Services\PhotoService;
 use VkPhotos\Services\CacheService;
 use VkPhotos\Services\CacheServiceInterface;
+use VkPhotos\Services\TemplateService;
 use VkPhotos\Models\Settings as SettingsModel;
 use VkPhotos\Repositories\AlbumRepository;
 use VkPhotos\Repositories\PhotoRepository;
@@ -175,6 +176,14 @@ class Bootstrap {
 			AlbumsViewData::class,
 			function (): AlbumsViewData {
 				return Container::make( AlbumsService::class );
+			}
+		);
+
+		// Bind template service.
+		Container::singleton(
+			TemplateService::class,
+			function (): TemplateService {
+				return new TemplateService();
 			}
 		);
 	}

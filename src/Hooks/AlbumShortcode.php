@@ -12,6 +12,7 @@ use VkPhotos\Models\Photo as PhotoModel;
 use VkPhotos\Repositories\AlbumRepository;
 use VkPhotos\Services\SettingsService;
 use VkPhotos\Services\PhotoService;
+use VkPhotos\Services\TemplateService;
 
 /**
  * Registers and handles the album shortcode.
@@ -47,6 +48,13 @@ class AlbumShortcode {
 	private PhotoService $photo_service;
 
 	/**
+	 * Template service.
+	 *
+	 * @var TemplateService
+	 */
+	private TemplateService $template_service;
+
+	/**
 	 * Allowed size keys (legacy names).
 	 *
 	 * @var array<int, string>
@@ -67,12 +75,14 @@ class AlbumShortcode {
 		?SettingsService $settings_service = null,
 		?VkApiClientInterface $api_client = null,
 		?AlbumRepository $album_repository = null,
-		?PhotoService $photo_service = null
+		?PhotoService $photo_service = null,
+		?TemplateService $template_service = null
 	) {
-		$this->settings_service = $settings_service ?? Container::make( SettingsService::class );
-		$this->api_client       = $api_client ?? Container::make( VkApiClientInterface::class );
-		$this->album_repository = $album_repository ?? Container::make( AlbumRepository::class );
-		$this->photo_service    = $photo_service ?? Container::make( PhotoService::class );
+		$this->settings_service  = $settings_service ?? Container::make( SettingsService::class );
+		$this->api_client        = $api_client ?? Container::make( VkApiClientInterface::class );
+		$this->album_repository  = $album_repository ?? Container::make( AlbumRepository::class );
+		$this->photo_service     = $photo_service ?? Container::make( PhotoService::class );
+		$this->template_service  = $template_service ?? Container::make( TemplateService::class );
 
 		add_shortcode( 'vkalbum', array( $this, 'render' ) );
 	}
@@ -166,21 +176,29 @@ class AlbumShortcode {
 			$output .= wp_kses_post( $album->description ) . '<br>';
 		}
 
-		$templates_frontend_dir = Config::get( 'paths.templates.frontend', '' );
-		$plugin_url             = Config::get( 'plugin.url', '' );
-		$template_dir           = $templates_frontend_dir . $atts['template'] . '/';
-		$template_style         = @file_get_contents( $plugin_url . 'templates/frontend/' . $atts['template'] . '/style.html' );
-		$template_head          = @file_get_contents( $template_dir . 'header.html' );
-		$template_item          = @file_get_contents( $template_dir . 'item.html' );
-		$template_foot          = @file_get_contents( $template_dir . 'footer.html' );
+		$plugin_url = Config::get( 'plugin.url', '' );
 
-		$output .= str_replace( '[[ID]]', $album_id, $template_style );
-		$output  = str_replace( '[[DIRECTORY_PLUGIN]]', $plugin_url, $output );
+		// Render templates using TemplateService
+		$template_style = $this->template_service->render_style( $atts['template'], [
+			'ID'                => $album_id,
+			'DIRECTORY_PLUGIN'  => $plugin_url,
+		] );
 
-		$output .= str_replace( '[[ID]]', $album_id, (string) $template_head );
+		$template_head = $this->template_service->render_header( $atts['template'], [
+			'ID' => $album_id,
+		] );
 
-		$template_item = str_replace( '[[VIEWER]]', $template_viewer, $template_item );
-		$template_item = str_replace( '[[ID]]', $album_id, $template_item );
+		$template_item = $this->template_service->render_item( $atts['template'], [
+			'VIEWER' => $template_viewer,
+			'ID'     => $album_id,
+		] );
+
+		$template_foot = $this->template_service->render_footer( $atts['template'], [
+			'ID' => $album_id,
+		] );
+
+		$output .= $template_style;
+		$output .= $template_head;
 
 		$limited_photos = array_slice( $photos, 0, (int) $atts['count'] );
 
@@ -212,7 +230,7 @@ class AlbumShortcode {
 		}
 
 		$output  = str_replace( '[[VIEWER]]', '', str_replace( '[[SIGNATURES]]', '', str_replace( '[[VIEWERSIGN]]', '', $output ) ) );
-		$output .= str_replace( '[[ID]]', $album_id, (string) $template_foot );
+		$output .= $template_foot;
 
 		// Initialize Fancybox if viewer is fancybox.
 		if ( 'fancybox' === $atts['viewer'] ) {
