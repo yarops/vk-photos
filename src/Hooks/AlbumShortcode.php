@@ -55,7 +55,19 @@ class AlbumShortcode {
 	private TemplateService $template_service;
 
 	/**
-	 * Allowed size keys (legacy names).
+	 * Allowed photo size keys supported by VK API.
+	 *
+	 * These are legacy size names used by VK's photo storage system.
+	 * Each key corresponds to a specific maximum dimension:
+	 * - 'photo_75': 75px width/height (thumbnail)
+	 * - 'photo_130': 130px width/height (small preview)
+	 * - 'photo_604': 604px width/height (medium size, suitable for web display)
+	 * - 'photo_807': 807px width/height (large size)
+	 * - 'photo_1280': 1280px width/height (HD size)
+	 * - 'photo_2560': 2560px width/height (maximum available size)
+	 *
+	 * Used by {@see AlbumShortcode::normalize_size()} to validate and normalize
+	 * size parameters from shortcode attributes.
 	 *
 	 * @var array<int, string>
 	 */
@@ -70,6 +82,12 @@ class AlbumShortcode {
 
 	/**
 	 * Register shortcode on construction.
+	 *
+	 * @param SettingsService|null      $settings_service Settings service instance.
+	 * @param VkApiClientInterface|null $api_client VK API client instance.
+	 * @param AlbumRepository|null      $album_repository Album repository instance.
+	 * @param PhotoService|null         $photo_service Photo service instance.
+	 * @param TemplateService|null      $template_service Template service instance.
 	 */
 	public function __construct(
 		?SettingsService $settings_service = null,
@@ -78,11 +96,11 @@ class AlbumShortcode {
 		?PhotoService $photo_service = null,
 		?TemplateService $template_service = null
 	) {
-		$this->settings_service  = $settings_service ?? Container::make( SettingsService::class );
-		$this->api_client        = $api_client ?? Container::make( VkApiClientInterface::class );
-		$this->album_repository  = $album_repository ?? Container::make( AlbumRepository::class );
-		$this->photo_service     = $photo_service ?? Container::make( PhotoService::class );
-		$this->template_service  = $template_service ?? Container::make( TemplateService::class );
+		$this->settings_service = $settings_service ?? Container::make( SettingsService::class );
+		$this->api_client       = $api_client ?? Container::make( VkApiClientInterface::class );
+		$this->album_repository = $album_repository ?? Container::make( AlbumRepository::class );
+		$this->photo_service    = $photo_service ?? Container::make( PhotoService::class );
+		$this->template_service = $template_service ?? Container::make( TemplateService::class );
 
 		add_shortcode( 'vkalbum', array( $this, 'render' ) );
 	}
@@ -138,22 +156,7 @@ class AlbumShortcode {
 		$output          = '';
 		$template_viewer = '';
 
-		// Configure viewer based on settings.
 		if ( 'fancybox' === $atts['viewer'] ) {
-			// Enqueue Fancybox scripts and styles.
-			wp_enqueue_script(
-				'fancybox',
-				'https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js',
-				array( 'jquery' ),
-				'5.0',
-				true
-			);
-			wp_enqueue_style(
-				'fancybox',
-				'https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css',
-				array(),
-				'5.0'
-			);
 			$template_viewer = ' data-fancybox="gallery-' . esc_attr( $album_id ) . '"';
 		} elseif ( 'new tab' === $atts['viewer'] ) {
 			$template_viewer = ' target="_blank"';
@@ -169,28 +172,36 @@ class AlbumShortcode {
 			return '<div class="vkp-error">' . esc_html__( 'Photos not available.', 'vkp' ) . '</div>';
 		}
 
-		if ( $atts['show_title'] === 'yes' ) {
+		if ( 'yes' === $atts['show_title'] ) {
 			$output .= '<h2>' . esc_html( $album->title ) . '</h2>';
 		}
-		if ( $atts['show_description'] === 'yes' && ! empty( $album->description ) ) {
+		if ( 'yes' === $atts['show_description'] && ! empty( $album->description ) ) {
 			$output .= wp_kses_post( $album->description ) . '<br>';
 		}
 
 		$plugin_url = Config::get( 'plugin.url', '' );
 
-		// Render templates using TemplateService
-		$template_head = $this->template_service->render_header( $atts['template'], [
-			'ID' => $album_id,
-		] );
+		$template_head = $this->template_service->render_header(
+			$atts['template'],
+			array(
+				'ID' => $album_id,
+			)
+		);
 
-		$template_item = $this->template_service->render_item( $atts['template'], [
-			'VIEWER' => $template_viewer,
-			'ID'     => $album_id,
-		] );
+		$template_item = $this->template_service->render_item(
+			$atts['template'],
+			array(
+				'VIEWER' => $template_viewer,
+				'ID'     => $album_id,
+			)
+		);
 
-		$template_foot = $this->template_service->render_footer( $atts['template'], [
-			'ID' => $album_id,
-		] );
+		$template_foot = $this->template_service->render_footer(
+			$atts['template'],
+			array(
+				'ID' => $album_id,
+			)
+		);
 
 		$output .= $template_head;
 
@@ -210,7 +221,7 @@ class AlbumShortcode {
 
 			$item = str_replace( '[[PHOTO]]', esc_url( $photo_url ), $template_item );
 
-			if ( $atts['sign'] === 'yes' ) {
+			if ( 'yes' === $atts['sign'] ) {
 				$item = str_replace( '[[SIGNATURES]]', esc_html( $photo_model->text ), $item );
 				if ( 'fancybox' === $atts['viewer'] ) {
 					$item = str_replace( '[[VIEWERSIGN]]', " data-caption='" . esc_attr( $photo_model->text ) . "'", $item );
@@ -225,23 +236,6 @@ class AlbumShortcode {
 
 		$output  = str_replace( '[[VIEWER]]', '', str_replace( '[[SIGNATURES]]', '', str_replace( '[[VIEWERSIGN]]', '', $output ) ) );
 		$output .= $template_foot;
-
-		// Initialize Fancybox if viewer is fancybox.
-		if ( 'fancybox' === $atts['viewer'] ) {
-			$output .= '<script>
-				jQuery(document).ready(function($) {
-					Fancybox.bind("[data-fancybox=\'gallery-' . esc_js( $album_id ) . '\']", {
-						Toolbar: {
-							display: {
-								left: ["infobar"],
-								middle: [],
-								right: ["slideshow", "download", "thumbs", "close"]
-							}
-						}
-					});
-				});
-			</script>';
-		}
 
 		return $output;
 	}

@@ -109,7 +109,11 @@ class SettingsService {
 	 * @param mixed  $value     New value.
 	 * @return void
 	 */
-	public function handle_option_update( string $option, $old_value, $value ): void {
+	public function handle_option_update(
+		string $option,
+		$old_value,
+		$value
+	): void {
 		if ( ! in_array( $option, $this->get_cache_invalidation_options(), true ) ) {
 			return;
 		}

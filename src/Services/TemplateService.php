@@ -21,9 +21,9 @@ use VkPhotos\Configs\Templates\BlocksTemplateConfig;
 class TemplateService {
 
 	/**
-	 * Cache for loaded templates.
+	 * Cache for loaded templates with modification time.
 	 *
-	 * @var array<string, string>
+	 * @var array<string, array{content: string, mtime: int}>
 	 */
 	private array $cache = array();
 
@@ -64,12 +64,38 @@ class TemplateService {
 	}
 
 	/**
+	 * Enqueue global assets (scripts and styles used by all templates).
+	 *
+	 * @return void
+	 */
+	private function enqueue_global_assets(): void {
+		// Enqueue global app.js script.
+		wp_enqueue_script(
+			'vk-photos-app',
+			Config::get( 'plugin.url', '' ) . 'dist/app.js',
+			array(),
+			'1.0.0',
+			true
+		);
+		// Enqueue global app.css style.
+		wp_enqueue_style(
+			'vk-photos-app',
+			Config::get( 'plugin.url', '' ) . 'dist/app.css',
+			array(),
+			'1.0.0'
+		);
+	}
+
+	/**
 	 * Enqueue template assets (scripts and styles).
 	 *
 	 * @param string $template_slug Template slug.
 	 * @return void
 	 */
 	public function enqueue_template_assets( string $template_slug ): void {
+		// Enqueue global assets first.
+		$this->enqueue_global_assets();
+
 		if ( ! isset( $this->template_configs[ $template_slug ] ) ) {
 			return;
 		}
@@ -215,17 +241,107 @@ class TemplateService {
 	/**
 	 * Load template content from file.
 	 *
-	 * Uses caching to avoid repeated file reads.
-	 * Suppresses errors with @ to handle missing files gracefully.
+	 * Uses caching to avoid repeated file reads with file modification time checking.
+	 * Provides proper error handling and logging for debugging.
 	 *
 	 * @param string $path Full path to template file.
 	 * @return string Template content or empty string on failure.
 	 */
 	private function load_template( string $path ): string {
-		if ( ! isset( $this->cache[ $path ] ) ) {
-			$this->cache[ $path ] = @file_get_contents( $path ) ?: '';
+		// Validate template path for security.
+		if ( ! $this->is_valid_template_path( $path ) ) {
+			$this->log_error( 'Invalid template path: ' . $path );
+			return '';
 		}
-		return $this->cache[ $path ];
+
+		// Check cache with file modification time validation.
+		if ( isset( $this->cache[ $path ] ) ) {
+			$cache_entry = $this->cache[ $path ];
+			if ( filemtime( $path ) === $cache_entry['mtime'] ) {
+				return $cache_entry['content'];
+			}
+		}
+
+		// Load template content with proper error handling.
+		$content = $this->load_template_file( $path );
+
+		// Cache with modification time.
+		$this->cache[ $path ] = array(
+			'content' => $content,
+			'mtime'   => file_exists( $path ) ? filemtime( $path ) : 0,
+		);
+
+		return $content;
+	}
+
+	/**
+	 * Load template file content with proper error handling.
+	 *
+	 * @param string $path Full path to template file.
+	 * @return string Template content or empty string on failure.
+	 */
+	private function load_template_file( string $path ): string {
+		if ( ! $this->template_exists( $path ) ) {
+			$this->log_error( 'Template file not found: ' . $path );
+			return '';
+		}
+
+		$content = file_get_contents( $path );
+
+		if ( false === $content ) {
+			$this->log_error( 'Failed to read template file: ' . $path );
+			return '';
+		}
+
+		return $content;
+	}
+
+	/**
+	 * Validate template path for security.
+	 *
+	 * Ensures the template path is within allowed directories and has valid extension.
+	 *
+	 * @param string $path Full path to template file.
+	 * @return bool True if path is valid and secure.
+	 */
+	private function is_valid_template_path( string $path ): bool {
+		// Check if path is within plugin templates directory.
+		$templates_dir       = Config::get( 'paths.templates.frontend', '' );
+		$admin_templates_dir = Config::get( 'paths.templates.admin', '' );
+
+		$allowed_dirs = array(
+			realpath( $templates_dir ),
+			realpath( $admin_templates_dir ),
+		);
+
+		$real_path = realpath( $path );
+		if ( false === $real_path ) {
+			return false;
+		}
+
+		foreach ( $allowed_dirs as $allowed_dir ) {
+			if ( false !== $allowed_dir && 0 === strpos( $real_path, $allowed_dir ) ) {
+				// Check file extension.
+				$extension = pathinfo( $real_path, PATHINFO_EXTENSION );
+				if ( in_array( $extension, array( 'html', 'php' ), true ) ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Log error message for debugging.
+	 *
+	 * @param string $message Error message.
+	 * @return void
+	 */
+	private function log_error( string $message ): void {
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			error_log( '[VK Photos Template Service] ' . $message );
+		}
 	}
 
 	/**
