@@ -109,18 +109,18 @@ class AlbumsService implements AlbumsViewData {
 	 * @return array<int, array<string, mixed>> Accounts data.
 	 */
 	private function build_accounts_data( SettingsModel $settings ): array {
-		$accounts       = $settings->accounts ?? array();
-		$accounts_types = $settings->accounts_type ?? array();
-		$result         = array();
+		// Get accounts in v2 format (structured array).
+		$accounts = $settings->get_accounts_v2();
+		$result   = array();
 
-		foreach ( $accounts as $index => $raw_id ) {
-			$account_id = (int) $raw_id;
+		foreach ( $accounts as $account ) {
+			$account_id = (int) $account['id'];
+			$type       = $account['type'] ?? 'user';
+			$is_group   = ( 'group' === $type );
+
 			if ( $account_id <= 0 ) {
 				continue;
 			}
-
-			$type     = ( isset( $accounts_types[ $index ] ) && 'group' === $accounts_types[ $index ] ) ? 'group' : 'user';
-			$is_group = ( 'group' === $type );
 
 			$account_data = array(
 				'id'          => $account_id,

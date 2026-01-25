@@ -139,6 +139,7 @@ class SettingsService {
 			'vkpAccessToken',
 			'vkpAccaunts',
 			'vkpAccaunts_type',
+			'vkpAccaunts_v2',
 			'vkpPreviewSize',
 			'vkpPhotoViewSize',
 			'vkpLifeTimeCaching',

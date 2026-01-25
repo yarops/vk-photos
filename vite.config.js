@@ -12,6 +12,7 @@ export default defineConfig({
 				fresh: resolve(__dirname, 'sources/scripts/fresh.js'),
 				light: resolve(__dirname, 'sources/scripts/light.js'),
 				admin: resolve(__dirname, 'sources/scripts/admin.js'),
+				'accounts-admin': resolve(__dirname, 'sources/scripts/accounts-admin.js'),
 			},
 			output: {
 				entryFileNames: '[name].js',

@@ -18,6 +18,7 @@ use VkPhotos\Services\PhotoService;
 use VkPhotos\Services\CacheService;
 use VkPhotos\Services\CacheServiceInterface;
 use VkPhotos\Services\TemplateService;
+use VkPhotos\Services\MigrationService;
 use VkPhotos\Models\Settings as SettingsModel;
 use VkPhotos\Repositories\AlbumRepository;
 use VkPhotos\Repositories\PhotoRepository;
@@ -74,6 +75,9 @@ class Bootstrap {
 			false,
 			Config::get( 'paths.languages' )
 		);
+
+		// Check and run migrations.
+		$this->run_migrations();
 
 		// Register hooks.
 		$this->register_hooks();
@@ -210,5 +214,14 @@ class Bootstrap {
 				Container::make( AlbumShortcode::class );
 			}
 		);
+	}
+
+	/**
+	 * Run plugin migrations.
+	 *
+	 * @return void
+	 */
+	private function run_migrations(): void {
+		MigrationService::check_migrations();
 	}
 }
