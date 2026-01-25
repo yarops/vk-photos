@@ -179,11 +179,6 @@ class AlbumShortcode {
 		$plugin_url = Config::get( 'plugin.url', '' );
 
 		// Render templates using TemplateService
-		$template_style = $this->template_service->render_style( $atts['template'], [
-			'ID'                => $album_id,
-			'DIRECTORY_PLUGIN'  => $plugin_url,
-		] );
-
 		$template_head = $this->template_service->render_header( $atts['template'], [
 			'ID' => $album_id,
 		] );
@@ -197,7 +192,6 @@ class AlbumShortcode {
 			'ID' => $album_id,
 		] );
 
-		$output .= $template_style;
 		$output .= $template_head;
 
 		$limited_photos = array_slice( $photos, 0, (int) $atts['count'] );

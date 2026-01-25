@@ -7,6 +7,7 @@ export default defineConfig({
 		emptyOutDir: true,
 		rollupOptions: {
 			input: {
+				app: resolve(__dirname, 'sources/scripts/app.js'),
 				blocks: resolve(__dirname, 'sources/scripts/blocks.js'),
 				fresh: resolve(__dirname, 'sources/scripts/fresh.js'),
 				light: resolve(__dirname, 'sources/scripts/light.js'),
